@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, type ChangeEvent } from "react";
 
 export interface BrandStyle {
   brandName: string;
@@ -77,9 +77,12 @@ export default function BrandGuidelines({
 
   const handleClear = () => {
     onChange(getDefaultBrandStyle());
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
