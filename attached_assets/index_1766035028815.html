@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rose Skin 2 - Bulk Image Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F5E6D3 0%, #FFE4E1 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #D4A5A5 0%, #C8A882 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            color: #8B7355;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E8D4C0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #C8A882;
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #D4A5A5 0%, #C8A882 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 165, 165, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #7A9B7F 0%, #6B8E70 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #E8A87C 0%, #D89A6E 100%);
+        }
+        
+        .progress-container {
+            background: #F5F5F5;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .progress-container.active {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #E0E0E0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #D4A5A5 0%, #C8A882 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .status-text {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .results.active {
+            display: block;
+        }
+        
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .image-card {
+            border: 2px solid #E8D4C0;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+        
+        .image-number {
+            color: #8B7355;
+            font-weight: 600;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-info {
+            background: #E3F2FD;
+            color: #1565C0;
+            border-left: 4px solid #1565C0;
+        }
+        
+        .alert-success {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border-left: 4px solid #2E7D32;
+        }
+        
+        .alert-error {
+            background: #FFEBEE;
+            color: #C62828;
+            border-left: 4px solid #C62828;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .help-text {
+            font-size: 13px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #F5E6D3;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #8B7355;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌹 Rose Skin 2</h1>
+            <p>Bulk AI Image Generator for Instagram</p>
+        </div>
+        
+        <div class="content">
+            <!-- API Configuration -->
+            <div class="section">
+                <h2>⚙️ Configuration</h2>
+                
+                <div class="alert alert-info">
+                    <strong>🔑 Get your Replicate API token:</strong>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>Go to <a href="https://replicate.com/account/api-tokens" target="_blank">replicate.com/account/api-tokens</a></li>
+                        <li>Sign up or log in</li>
+                        <li>Copy your API token</li>
+                        <li>Paste it below</li>
+                    </ol>
+                </div>
+                
+                <div class="input-group">
+                    <label for="apiToken">Replicate API Token</label>
+                    <input type="text" id="apiToken" placeholder="r8_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                    <div class="help-text">Your token is stored locally and never saved on the server</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="model">AI Model</label>
+                    <select id="model">
+                        <option value="flux-schnell">FLUX Schnell (Fast, Free tier)</option>
+                        <option value="flux-dev">FLUX Dev (Higher quality, costs more)</option>
+                        <option value="sdxl">Stable Diffusion XL</option>
+                    </select>
+                    <div class="help-text">FLUX Schnell recommended for fast, quality results</div>
+                </div>
+            </div>
+            
+            <!-- Prompts Input -->
+            <div class="section">
+                <h2>📝 Prompts</h2>
+                
+                <div class="quick-actions">
+                    <button class="btn btn-secondary" onclick="loadRoseSkinPrompts()">
+                        Load Rose Skin 2 Prompts (30 images)
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearPrompts()">
+                        Clear
+                    </button>
+                </div>
+                
+                <div class="input-group">
+                    <label for="prompts">Prompts (JSON format)</label>
+                    <textarea id="prompts" placeholder='[
+  {"number": 1, "prompt": "Your prompt here"},
+  {"number": 2, "prompt": "Another prompt"}
+]'></textarea>
+                    <div class="help-text">Each prompt should have a "number" and "prompt" field</div>
+                </div>
+            </div>
+            
+            <!-- Generate Button -->
+            <div class="section">
+                <button class="btn" id="generateBtn" onclick="startGeneration()">
+                    🚀 Generate All Images
+                </button>
+            </div>
+            
+            <!-- Progress -->
+            <div class="progress-container" id="progressContainer">
+                <div class="stats" id="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statCurrent">0</div>
+                        <div class="stat-label">Current</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statSuccess">0</div>
+                        <div class="stat-label">Success</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statErrors">0</div>
+                        <div class="stat-label">Errors</div>
+                    </div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%">
+                        <span id="progressText">0%</span>
+                    </div>
+                </div>
+                
+                <div class="status-text" id="statusText">
+                    Initializing...
+                </div>
+            </div>
+            
+            <!-- Results -->
+            <div class="results" id="results">
+                <h2>✅ Generation Complete!</h2>
+                
+                <div class="quick-actions">
+                    <button class="btn" onclick="downloadAll()">
+                        📥 Download All as ZIP
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAll()">
+                        🗑️ Clear All
+                    </button>
+                </div>
+                
+                <div class="image-grid" id="imageGrid">
+                    <!-- Images will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let statusCheckInterval = null;
+        
+        function loadRoseSkinPrompts() {
+            fetch('/api/load-rose-skin-prompts')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('prompts').value = JSON.stringify(data, null, 2);
+                    alert('✓ Loaded 30 Rose Skin 2 prompts!');
+                })
+                .catch(err => {
+                    alert('Error loading prompts: ' + err.message);
+                });
+        }
+        
+        function clearPrompts() {
+            document.getElementById('prompts').value = '';
+        }
+        
+        function startGeneration() {
+            const apiToken = document.getElementById('apiToken').value.trim();
+            const model = document.getElementById('model').value;
+            const promptsText = document.getElementById('prompts').value.trim();
+            
+            if (!apiToken) {
+                alert('❌ Please enter your Replicate API token');
+                return;
+            }
+            
+            let prompts;
+            try {
+                prompts = JSON.parse(promptsText);
+            } catch (e) {
+                alert('❌ Invalid JSON format in prompts');
+                return;
+            }
+            
+            if (!Array.isArray(prompts) || prompts.length === 0) {
+                alert('❌ Prompts must be a non-empty array');
+                return;
+            }
+            
+            // Disable button
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('generateBtn').textContent = '⏳ Generating...';
+            
+            // Show progress
+            document.getElementById('progressContainer').classList.add('active');
+            document.getElementById('results').classList.remove('active');
+            
+            // Start generation
+            fetch('/api/generate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    prompts: prompts,
+                    api_token: apiToken,
+                    model: model
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                // Start checking status
+                checkStatus();
+            })
+            .catch(err => {
+                alert('Error: ' + err.message);
+                resetUI();
+            });
+        }
+        
+        function checkStatus() {
+            statusCheckInterval = setInterval(() => {
+                fetch('/api/status')
+                    .then(res => res.json())
+                    .then(status => {
+                        updateProgress(status);
+                        
+                        if (status.status === 'completed') {
+                            clearInterval(statusCheckInterval);
+                            showResults(status);
+                        }
+                    });
+            }, 2000);
+        }
+        
+        function updateProgress(status) {
+            const percent = status.total > 0 ? Math.round((status.current / status.total) * 100) : 0;
+            
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = percent + '%';
+            document.getElementById('statCurrent').textContent = status.current;
+            document.getElementById('statTotal').textContent = status.total;
+            document.getElementById('statSuccess').textContent = status.images.length;
+            document.getElementById('statErrors').textContent = status.errors.length;
+            document.getElementById('statusText').textContent = 
+                `Generating image ${status.current} of ${status.total}...`;
+        }
+        
+        function showResults(status) {
+            resetUI();
+            
+            document.getElementById('results').classList.add('active');
+            
+            const imageGrid = document.getElementById('imageGrid');
+            imageGrid.innerHTML = '';
+            
+            status.images.forEach(img => {
+                const card = document.createElement('div');
+                card.className = 'image-card';
+                card.innerHTML = `
+                    <img src="/generated_images/${img.filename}" alt="Post ${img.number}">
+                    <div class="image-number">Post #${img.number}</div>
+                `;
+                imageGrid.appendChild(card);
+            });
+            
+            if (status.errors.length > 0) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-error';
+                alertDiv.innerHTML = `<strong>⚠️ ${status.errors.length} images failed to generate</strong>`;
+                document.getElementById('results').insertBefore(alertDiv, imageGrid);
+            }
+        }
+        
+        function downloadAll() {
+            window.location.href = '/api/download-all';
+        }
+        
+        function clearAll() {
+            if (confirm('Are you sure you want to delete all generated images?')) {
+                fetch('/api/clear')
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById('results').classList.remove('active');
+                        alert('✓ All images cleared');
+                    });
+            }
+        }
+        
+        function resetUI() {
+            document.getElementById('generateBtn').disabled = false;
+            document.getElementById('generateBtn').textContent = '🚀 Generate All Images';
+        }
+    </script>
+</body>
+</html>
