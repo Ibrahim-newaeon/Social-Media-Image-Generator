@@ -3,8 +3,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Palette, Type, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image } from "lucide-react";
+import { useState, useRef } from "react";
 
 export interface BrandStyle {
   brandName: string;
@@ -13,6 +13,7 @@ export interface BrandStyle {
   fontStyle: string;
   visualStyle: string;
   additionalNotes: string;
+  logoDataUrl: string;
 }
 
 interface BrandGuidelinesProps {
@@ -28,6 +29,7 @@ const defaultBrandStyle: BrandStyle = {
   fontStyle: "",
   visualStyle: "",
   additionalNotes: "",
+  logoDataUrl: "",
 };
 
 export function getDefaultBrandStyle(): BrandStyle {
@@ -67,6 +69,7 @@ export default function BrandGuidelines({
   disabled = false,
 }: BrandGuidelinesProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (field: keyof BrandStyle, value: string) => {
     onChange({ ...brandStyle, [field]: value });
@@ -74,6 +77,29 @@ export default function BrandGuidelines({
 
   const handleClear = () => {
     onChange(getDefaultBrandStyle());
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      onChange({ ...brandStyle, logoDataUrl: dataUrl });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = () => {
+    onChange({ ...brandStyle, logoDataUrl: "" });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const hasContent = Object.values(brandStyle).some((v) => v.length > 0);
@@ -119,9 +145,18 @@ export default function BrandGuidelines({
           </div>
         </div>
         {!isExpanded && hasContent && (
-          <p className="text-sm text-muted-foreground mt-2">
-            Brand guidelines will be applied to all generated images
-          </p>
+          <div className="flex items-center gap-3 mt-2">
+            {brandStyle.logoDataUrl && (
+              <img 
+                src={brandStyle.logoDataUrl} 
+                alt="Brand logo" 
+                className="h-6 w-6 object-contain rounded"
+              />
+            )}
+            <p className="text-sm text-muted-foreground">
+              Brand guidelines{brandStyle.logoDataUrl ? " and logo" : ""} will be applied to all generated images
+            </p>
+          </div>
         )}
       </CardHeader>
       
@@ -132,6 +167,59 @@ export default function BrandGuidelines({
           </p>
           
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Image className="h-4 w-4" />
+                Brand Logo
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Your logo will be placed in the bottom-right corner of all generated images (5-8% of image width, with padding).
+              </p>
+              
+              {brandStyle.logoDataUrl ? (
+                <div className="flex items-center gap-4 p-3 border rounded-md bg-muted/30">
+                  <img 
+                    src={brandStyle.logoDataUrl} 
+                    alt="Brand logo preview" 
+                    className="h-12 w-12 object-contain rounded bg-white p-1"
+                    data-testid="img-logo-preview"
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">Logo uploaded</p>
+                    <p className="text-xs text-muted-foreground">Will appear on all generated images</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleRemoveLogo}
+                    disabled={disabled}
+                    data-testid="button-remove-logo"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div 
+                  className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed rounded-md cursor-pointer hover-elevate"
+                  onClick={() => !disabled && fileInputRef.current?.click()}
+                  data-testid="div-logo-upload"
+                >
+                  <Upload className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Click to upload your logo</p>
+                  <p className="text-xs text-muted-foreground">PNG, JPG, or SVG recommended</p>
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="hidden"
+                disabled={disabled}
+                data-testid="input-logo-file"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="brandName">Brand Name</Label>
               <Input

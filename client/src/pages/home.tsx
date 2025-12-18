@@ -8,6 +8,7 @@ import ImagePreviewModal from "@/components/ImagePreviewModal";
 import BrandGuidelines, { BrandStyle, getDefaultBrandStyle, formatBrandStyleForPrompt } from "@/components/BrandGuidelines";
 import { GeneratedImage } from "@/components/ImageCard";
 import { useToast } from "@/hooks/use-toast";
+import { overlayLogoOnImage } from "@/lib/logoOverlay";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -97,7 +98,21 @@ export default function Home() {
         }
 
         const data = await response.json();
-        const imageUrl = `data:${data.mimeType};base64,${data.b64_json}`;
+        let imageUrl = `data:${data.mimeType};base64,${data.b64_json}`;
+        
+        if (brandStyle.logoDataUrl) {
+          try {
+            imageUrl = await overlayLogoOnImage({
+              logoDataUrl: brandStyle.logoDataUrl,
+              imageDataUrl: imageUrl,
+              logoSizePercent: 6,
+              paddingPercent: 3,
+              addBadgeBackground: true,
+            });
+          } catch (overlayError) {
+            console.error("Logo overlay failed:", overlayError);
+          }
+        }
         
         setImages((prev) =>
           prev.map((img) =>
