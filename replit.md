@@ -23,7 +23,7 @@ Preferred communication style: Simple, everyday language.
 - Client-side image processing and ZIP creation using JSZip and FileSaver
 - Real-time progress tracking during bulk generation with ref-based stop control
 - Brand Style Guidelines feature allows users to define brand identity (colors, fonts, visual style) that automatically prefixes all image generation prompts
-- Logo overlay feature: Users can upload a brand logo that is automatically composited onto all generated images in the bottom-right corner (6% width, with padding and optional badge background for readability)
+- Logo overlay feature: Users can upload a brand logo that is automatically composited onto all generated images in the bottom-right corner (25% width, with padding, preserving logo transparency)
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express

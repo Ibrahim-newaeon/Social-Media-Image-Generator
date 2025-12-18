@@ -9,7 +9,7 @@ export async function overlayLogoOnImage(options: LogoOverlayOptions): Promise<s
   const {
     logoDataUrl,
     imageDataUrl,
-    logoSizePercent = 6,
+    logoSizePercent = 25,
     paddingPercent = 3,
   } = options;
 
