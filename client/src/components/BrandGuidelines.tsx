@@ -119,6 +119,13 @@ export default function BrandGuidelines({
     }
   };
 
+  const handleNewProfileClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    onNewProfile();
+  };
+
   const hasContent = Object.values(brandStyle).some((v) => v.length > 0);
 
   return (
@@ -162,7 +169,7 @@ export default function BrandGuidelines({
           </div>
         </div>
         
-        {savedProfiles.length > 0 && (
+        {savedProfiles && savedProfiles.length > 0 && (
           <div className="flex items-center gap-2 mt-3 flex-wrap">
             <Label className="text-sm text-muted-foreground">Saved Profiles:</Label>
             <Select
@@ -184,7 +191,7 @@ export default function BrandGuidelines({
             <Button
               variant="ghost"
               size="icon"
-              onClick={onNewProfile}
+              onClick={handleNewProfileClick}
               disabled={disabled}
               title="New profile"
               data-testid="button-new-profile"
@@ -307,7 +314,7 @@ export default function BrandGuidelines({
                 >
                   <Save className="h-4 w-4" />
                 </Button>
-                {savedProfiles.some(p => p.brandName.toLowerCase() === brandStyle.brandName.toLowerCase()) && (
+                {savedProfiles && savedProfiles.some(p => p.brandName.toLowerCase() === brandStyle.brandName.toLowerCase()) && (
                   <Button
                     variant="ghost"
                     size="icon"

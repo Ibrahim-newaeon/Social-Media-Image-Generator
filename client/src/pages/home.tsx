@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Header from "@/components/Header";
 import PromptInput from "@/components/PromptInput";
 import GenerateControls from "@/components/GenerateControls";
@@ -9,6 +9,14 @@ import BrandGuidelines, { BrandStyle, getDefaultBrandStyle, formatBrandStyleForP
 import { GeneratedImage } from "@/components/ImageCard";
 import { useToast } from "@/hooks/use-toast";
 import { overlayLogoOnImage } from "@/lib/logoOverlay";
+import { 
+  getAllProfiles, 
+  saveProfile, 
+  deleteProfile, 
+  loadActiveProfile, 
+  setActiveProfileName,
+  type BrandProfile 
+} from "@/lib/brandProfilesStorage";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -19,6 +27,7 @@ export default function Home() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [previewImage, setPreviewImage] = useState<GeneratedImage | null>(null);
   const [brandStyle, setBrandStyle] = useState<BrandStyle>(getDefaultBrandStyle());
+  const [savedProfiles, setSavedProfiles] = useState<BrandProfile[]>([]);
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus>({
     current: 0,
     total: 0,
@@ -27,6 +36,80 @@ export default function Home() {
   });
   const shouldStopRef = useRef(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    setSavedProfiles(getAllProfiles());
+    const activeProfile = loadActiveProfile();
+    if (activeProfile) {
+      setBrandStyle({
+        brandName: activeProfile.brandName,
+        primaryColors: activeProfile.primaryColor,
+        secondaryColors: activeProfile.secondaryColor,
+        fontStyle: activeProfile.fontStyle,
+        visualStyle: activeProfile.visualStyle,
+        additionalNotes: activeProfile.additionalNotes,
+        logoDataUrl: activeProfile.logoDataUrl || "",
+      });
+    }
+  }, []);
+
+  const handleSaveProfile = () => {
+    const trimmedName = brandStyle.brandName.trim();
+    if (!trimmedName) return;
+    
+    const profile: BrandProfile = {
+      brandName: trimmedName,
+      primaryColor: brandStyle.primaryColors,
+      secondaryColor: brandStyle.secondaryColors,
+      fontStyle: brandStyle.fontStyle,
+      visualStyle: brandStyle.visualStyle,
+      additionalNotes: brandStyle.additionalNotes,
+      logoDataUrl: brandStyle.logoDataUrl || null,
+      lastModified: Date.now(),
+    };
+    
+    setBrandStyle(prev => ({ ...prev, brandName: trimmedName }));
+    saveProfile(profile);
+    setActiveProfileName(profile.brandName);
+    setSavedProfiles(getAllProfiles());
+    
+    toast({
+      title: "Profile saved",
+      description: `Brand profile "${profile.brandName}" has been saved.`,
+    });
+  };
+
+  const handleLoadProfile = (brandName: string) => {
+    const profiles = getAllProfiles();
+    const profile = profiles.find(p => p.brandName === brandName);
+    if (profile) {
+      setBrandStyle({
+        brandName: profile.brandName,
+        primaryColors: profile.primaryColor,
+        secondaryColors: profile.secondaryColor,
+        fontStyle: profile.fontStyle,
+        visualStyle: profile.visualStyle,
+        additionalNotes: profile.additionalNotes,
+        logoDataUrl: profile.logoDataUrl || "",
+      });
+      setActiveProfileName(profile.brandName);
+    }
+  };
+
+  const handleDeleteProfile = (brandName: string) => {
+    deleteProfile(brandName);
+    setSavedProfiles(getAllProfiles());
+    setBrandStyle(getDefaultBrandStyle());
+    
+    toast({
+      title: "Profile deleted",
+      description: `Brand profile "${brandName}" has been deleted.`,
+    });
+  };
+
+  const handleNewProfile = () => {
+    setBrandStyle(getDefaultBrandStyle());
+  };
 
   const parsePrompts = useCallback((): string[] => {
     return prompts
@@ -107,7 +190,6 @@ export default function Home() {
               imageDataUrl: imageUrl,
               logoSizePercent: 6,
               paddingPercent: 3,
-              addBadgeBackground: true,
             });
           } catch (overlayError) {
             console.error("Logo overlay failed:", overlayError);
@@ -258,6 +340,11 @@ export default function Home() {
               brandStyle={brandStyle}
               onChange={setBrandStyle}
               disabled={isGenerating}
+              savedProfiles={savedProfiles}
+              onSaveProfile={handleSaveProfile}
+              onLoadProfile={handleLoadProfile}
+              onDeleteProfile={handleDeleteProfile}
+              onNewProfile={handleNewProfile}
             />
             <PromptInput
               prompts={prompts}
