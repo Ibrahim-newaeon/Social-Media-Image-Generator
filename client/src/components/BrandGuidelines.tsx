@@ -233,7 +233,7 @@ export default function BrandGuidelines({
                 <p className="font-medium">Logo Specifications:</p>
                 <ul className="list-disc list-inside space-y-0.5 ml-1">
                   <li>Position: Bottom-right corner</li>
-                  <li>Size: 6% of image width</li>
+                  <li>Size: 25% of image width</li>
                   <li>Padding: 3% from edges</li>
                   <li>Format: PNG with transparency recommended</li>
                 </ul>
