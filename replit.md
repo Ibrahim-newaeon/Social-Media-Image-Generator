@@ -19,9 +19,10 @@ Preferred communication style: Simple, everyday language.
 - **Build Tool**: Vite with React plugin
 
 **Key Design Decisions**:
-- Component-based architecture with dedicated components for each UI concern (PromptInput, ImageGallery, GenerationProgress, etc.)
+- Component-based architecture with dedicated components for each UI concern (PromptInput, ImageGallery, GenerationProgress, BrandGuidelines, etc.)
 - Client-side image processing and ZIP creation using JSZip and FileSaver
 - Real-time progress tracking during bulk generation with ref-based stop control
+- Brand Style Guidelines feature allows users to define brand identity (colors, fonts, visual style) that automatically prefixes all image generation prompts
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express

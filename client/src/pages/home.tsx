@@ -5,6 +5,7 @@ import GenerateControls from "@/components/GenerateControls";
 import GenerationProgress, { GenerationStatus } from "@/components/GenerationProgress";
 import ImageGallery from "@/components/ImageGallery";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
+import BrandGuidelines, { BrandStyle, getDefaultBrandStyle, formatBrandStyleForPrompt } from "@/components/BrandGuidelines";
 import { GeneratedImage } from "@/components/ImageCard";
 import { useToast } from "@/hooks/use-toast";
 import JSZip from "jszip";
@@ -16,6 +17,7 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [previewImage, setPreviewImage] = useState<GeneratedImage | null>(null);
+  const [brandStyle, setBrandStyle] = useState<BrandStyle>(getDefaultBrandStyle());
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus>({
     current: 0,
     total: 0,
@@ -81,10 +83,13 @@ export default function Home() {
       }));
 
       try {
+        const brandPrefix = formatBrandStyleForPrompt(brandStyle);
+        const fullPrompt = brandPrefix + image.prompt;
+        
         const response = await fetch("/api/generate-image", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: image.prompt }),
+          body: JSON.stringify({ prompt: fullPrompt }),
         });
 
         if (!response.ok) {
@@ -234,6 +239,11 @@ export default function Home() {
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="space-y-6">
+            <BrandGuidelines
+              brandStyle={brandStyle}
+              onChange={setBrandStyle}
+              disabled={isGenerating}
+            />
             <PromptInput
               prompts={prompts}
               onChange={setPrompts}
