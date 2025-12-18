@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import Header from "@/components/Header";
 import PromptInput from "@/components/PromptInput";
 import GenerateControls from "@/components/GenerateControls";
@@ -22,7 +22,7 @@ export default function Home() {
     completed: 0,
     failed: 0,
   });
-  const [shouldStop, setShouldStop] = useState(false);
+  const shouldStopRef = useRef(false);
   const { toast } = useToast();
 
   const parsePrompts = useCallback((): string[] => {
@@ -44,7 +44,7 @@ export default function Home() {
     }
 
     setIsGenerating(true);
-    setShouldStop(false);
+    shouldStopRef.current = false;
     
     const initialImages: GeneratedImage[] = promptList.map((prompt, index) => ({
       id: `img-${Date.now()}-${index}`,
@@ -64,7 +64,7 @@ export default function Home() {
     let failed = 0;
 
     for (let i = 0; i < initialImages.length; i++) {
-      if (shouldStop) break;
+      if (shouldStopRef.current) break;
 
       const image = initialImages[i];
       
@@ -92,11 +92,12 @@ export default function Home() {
         }
 
         const data = await response.json();
+        const imageUrl = `data:${data.mimeType};base64,${data.b64_json}`;
         
         setImages((prev) =>
           prev.map((img) =>
             img.id === image.id
-              ? { ...img, status: "completed", imageUrl: data.imageUrl }
+              ? { ...img, status: "completed", imageUrl }
               : img
           )
         );
@@ -120,14 +121,16 @@ export default function Home() {
     }
 
     setIsGenerating(false);
-    toast({
-      title: "Generation complete",
-      description: `Generated ${completed} image${completed !== 1 ? "s" : ""} successfully.`,
-    });
+    if (!shouldStopRef.current) {
+      toast({
+        title: "Generation complete",
+        description: `Generated ${completed} image${completed !== 1 ? "s" : ""} successfully.`,
+      });
+    }
   };
 
   const handleStop = () => {
-    setShouldStop(true);
+    shouldStopRef.current = true;
     setIsGenerating(false);
     toast({
       title: "Generation stopped",
@@ -135,12 +138,23 @@ export default function Home() {
     });
   };
 
-  const handleDownload = async (image: GeneratedImage) => {
+  const base64ToBlob = (dataUrl: string): Blob => {
+    const [header, base64Data] = dataUrl.split(',');
+    const mimeMatch = header.match(/data:([^;]+);/);
+    const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: mimeType });
+  };
+
+  const handleDownload = (image: GeneratedImage) => {
     if (!image.imageUrl) return;
     
     try {
-      const response = await fetch(image.imageUrl);
-      const blob = await response.blob();
+      const blob = base64ToBlob(image.imageUrl);
       saveAs(blob, `image-${image.id}.png`);
     } catch (error) {
       toast({
@@ -175,8 +189,7 @@ export default function Home() {
         if (!image.imageUrl) continue;
 
         try {
-          const response = await fetch(image.imageUrl);
-          const blob = await response.blob();
+          const blob = base64ToBlob(image.imageUrl);
           zip.file(`image-${i + 1}.png`, blob);
         } catch (error) {
           console.error(`Failed to add image ${i + 1} to ZIP`);
