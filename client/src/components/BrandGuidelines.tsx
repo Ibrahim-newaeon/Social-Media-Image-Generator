@@ -175,9 +175,16 @@ export default function BrandGuidelines({
                 <Image className="h-4 w-4" />
                 Brand Logo
               </Label>
-              <p className="text-xs text-muted-foreground">
-                Your logo will be placed in the bottom-right corner of all generated images (5-8% of image width, with padding).
-              </p>
+              <div className="text-xs text-muted-foreground space-y-1 p-3 bg-muted/30 rounded-md">
+                <p className="font-medium">Logo Specifications:</p>
+                <ul className="list-disc list-inside space-y-0.5 ml-1">
+                  <li>Position: Bottom-right corner</li>
+                  <li>Size: 6% of image width</li>
+                  <li>Padding: 3% from edges</li>
+                  <li>Background: White/soft-beige badge for readability</li>
+                  <li>Format: PNG, JPG, or SVG recommended</li>
+                </ul>
+              </div>
               
               {brandStyle.logoDataUrl ? (
                 <div className="flex items-center gap-4 p-3 border rounded-md bg-muted/30">
