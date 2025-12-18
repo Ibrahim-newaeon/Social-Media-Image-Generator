@@ -3,7 +3,6 @@ export interface LogoOverlayOptions {
   imageDataUrl: string;
   logoSizePercent?: number;
   paddingPercent?: number;
-  opacity?: number;
 }
 
 export async function overlayLogoOnImage(options: LogoOverlayOptions): Promise<string> {
@@ -12,7 +11,6 @@ export async function overlayLogoOnImage(options: LogoOverlayOptions): Promise<s
     imageDataUrl,
     logoSizePercent = 6,
     paddingPercent = 3,
-    opacity = 0.5,
   } = options;
 
   return new Promise((resolve, reject) => {
@@ -45,10 +43,8 @@ export async function overlayLogoOnImage(options: LogoOverlayOptions): Promise<s
         const x = canvas.width - logoWidth - padding;
         const y = canvas.height - logoHeight - padding;
         
-        // Apply opacity for watermark effect
-        ctx.globalAlpha = opacity;
+        // Draw logo as-is (logo should have its own transparency)
         ctx.drawImage(logoImage, x, y, logoWidth, logoHeight);
-        ctx.globalAlpha = 1.0;
         
         const resultDataUrl = canvas.toDataURL("image/png");
         resolve(resultDataUrl);
