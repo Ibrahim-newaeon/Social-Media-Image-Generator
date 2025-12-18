@@ -28,16 +28,9 @@ export default function PromptInput({ prompts, onChange, disabled = false }: Pro
   };
 
   const loadSamplePrompts = () => {
-    const samplePrompts = `A luxury skincare product on marble surface with rose petals
-Professional product photography of moisturizer with gold accents
-Elegant serum bottle with soft pink lighting and silk fabric
-Anti-aging cream jar on clean white background with natural shadows
-Beauty product with botanical elements and morning dew drops
-Skincare routine flatlay with neutral tones and minimal styling
-Premium face oil in amber glass bottle with soft focus background
-Night cream with starry reflections and deep blue accents
-Vitamin C serum with citrus slices and fresh green leaves
-Eye cream in minimalist packaging with soft pastel backdrop`;
+    const samplePrompts = `Pink glass jar of rose scrub with dried petals on white marble, soft natural light, minimal aesthetic, blush pink tones.
+Luxury gift box with rose ribbon, body scrub and cream on velvet cushion, gold accents, warm studio light, elegant premium feel.
+Bridal skincare flat lay, scrub cream soap on silk with white roses, soft romantic light, ivory blush palette.`;
     onChange(samplePrompts);
   };
 
