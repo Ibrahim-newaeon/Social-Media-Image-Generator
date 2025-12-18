@@ -3,8 +3,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus } from "lucide-react";
 import { useState, useRef, type ChangeEvent } from "react";
+import type { BrandProfile } from "@/lib/brandProfilesStorage";
 
 export interface BrandStyle {
   brandName: string;
@@ -20,6 +22,11 @@ interface BrandGuidelinesProps {
   brandStyle: BrandStyle;
   onChange: (style: BrandStyle) => void;
   disabled?: boolean;
+  savedProfiles: BrandProfile[];
+  onSaveProfile: () => void;
+  onLoadProfile: (brandName: string) => void;
+  onDeleteProfile: (brandName: string) => void;
+  onNewProfile: () => void;
 }
 
 const defaultBrandStyle: BrandStyle = {
@@ -67,9 +74,16 @@ export default function BrandGuidelines({
   brandStyle,
   onChange,
   disabled = false,
+  savedProfiles,
+  onSaveProfile,
+  onLoadProfile,
+  onDeleteProfile,
+  onNewProfile,
 }: BrandGuidelinesProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const canSave = brandStyle.brandName.trim().length > 0;
 
   const handleChange = (field: keyof BrandStyle, value: string) => {
     onChange({ ...brandStyle, [field]: value });
@@ -147,6 +161,39 @@ export default function BrandGuidelines({
             </Button>
           </div>
         </div>
+        
+        {savedProfiles.length > 0 && (
+          <div className="flex items-center gap-2 mt-3 flex-wrap">
+            <Label className="text-sm text-muted-foreground">Saved Profiles:</Label>
+            <Select
+              value={brandStyle.brandName || ""}
+              onValueChange={(value) => onLoadProfile(value)}
+              disabled={disabled}
+            >
+              <SelectTrigger className="w-48" data-testid="select-brand-profile">
+                <SelectValue placeholder="Select a profile" />
+              </SelectTrigger>
+              <SelectContent>
+                {savedProfiles.map((profile) => (
+                  <SelectItem key={profile.brandName} value={profile.brandName}>
+                    {profile.brandName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onNewProfile}
+              disabled={disabled}
+              title="New profile"
+              data-testid="button-new-profile"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+        
         {!isExpanded && hasContent && (
           <div className="flex items-center gap-3 mt-2">
             {brandStyle.logoDataUrl && (
@@ -241,14 +288,41 @@ export default function BrandGuidelines({
 
             <div className="space-y-2">
               <Label htmlFor="brandName">Brand Name</Label>
-              <Input
-                id="brandName"
-                placeholder="e.g., Acme Corp"
-                value={brandStyle.brandName}
-                onChange={(e) => handleChange("brandName", e.target.value)}
-                disabled={disabled}
-                data-testid="input-brand-name"
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="brandName"
+                  placeholder="e.g., Acme Corp"
+                  value={brandStyle.brandName}
+                  onChange={(e) => handleChange("brandName", e.target.value)}
+                  disabled={disabled}
+                  data-testid="input-brand-name"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={onSaveProfile}
+                  disabled={disabled || !canSave}
+                  title="Save profile"
+                  data-testid="button-save-profile"
+                >
+                  <Save className="h-4 w-4" />
+                </Button>
+                {savedProfiles.some(p => p.brandName.toLowerCase() === brandStyle.brandName.toLowerCase()) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onDeleteProfile(brandStyle.brandName)}
+                    disabled={disabled}
+                    title="Delete profile"
+                    data-testid="button-delete-profile"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Enter a brand name and click save to store this profile for later use
+              </p>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
