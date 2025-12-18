@@ -187,12 +187,22 @@ export default function BrandGuidelines({
               
               {brandStyle.logoDataUrl ? (
                 <div className="flex items-center gap-4 p-3 border rounded-md bg-muted/30">
-                  <img 
-                    src={brandStyle.logoDataUrl} 
-                    alt="Brand logo preview" 
-                    className="h-12 w-12 object-contain rounded bg-white p-1"
-                    data-testid="img-logo-preview"
-                  />
+                  <div 
+                    className="h-12 w-12 rounded p-1"
+                    style={{
+                      backgroundImage: 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)',
+                      backgroundSize: '8px 8px',
+                      backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px',
+                      backgroundColor: '#fff'
+                    }}
+                  >
+                    <img 
+                      src={brandStyle.logoDataUrl} 
+                      alt="Brand logo preview" 
+                      className="h-full w-full object-contain"
+                      data-testid="img-logo-preview"
+                    />
+                  </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">Logo uploaded</p>
                     <p className="text-xs text-muted-foreground">Will appear on all generated images</p>
