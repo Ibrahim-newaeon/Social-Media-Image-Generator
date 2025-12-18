@@ -176,13 +176,13 @@ export default function BrandGuidelines({
                 Brand Logo
               </Label>
               <div className="text-xs text-muted-foreground space-y-1 p-3 bg-muted/30 rounded-md">
-                <p className="font-medium">Logo Specifications:</p>
+                <p className="font-medium">Watermark Specifications:</p>
                 <ul className="list-disc list-inside space-y-0.5 ml-1">
                   <li>Position: Bottom-right corner</li>
                   <li>Size: 6% of image width</li>
+                  <li>Opacity: 50% (subtle watermark)</li>
                   <li>Padding: 3% from edges</li>
-                  <li>Background: White/soft-beige badge for readability</li>
-                  <li>Format: PNG, JPG, or SVG recommended</li>
+                  <li>Format: PNG or SVG with transparency recommended</li>
                 </ul>
               </div>
               

@@ -3,9 +3,7 @@ export interface LogoOverlayOptions {
   imageDataUrl: string;
   logoSizePercent?: number;
   paddingPercent?: number;
-  addBadgeBackground?: boolean;
-  badgeColor?: string;
-  badgePadding?: number;
+  opacity?: number;
 }
 
 export async function overlayLogoOnImage(options: LogoOverlayOptions): Promise<string> {
@@ -14,9 +12,7 @@ export async function overlayLogoOnImage(options: LogoOverlayOptions): Promise<s
     imageDataUrl,
     logoSizePercent = 6,
     paddingPercent = 3,
-    addBadgeBackground = true,
-    badgeColor = "rgba(255, 255, 255, 0.85)",
-    badgePadding = 8,
+    opacity = 0.5,
   } = options;
 
   return new Promise((resolve, reject) => {
@@ -49,29 +45,10 @@ export async function overlayLogoOnImage(options: LogoOverlayOptions): Promise<s
         const x = canvas.width - logoWidth - padding;
         const y = canvas.height - logoHeight - padding;
         
-        if (addBadgeBackground) {
-          const badgeX = x - badgePadding;
-          const badgeY = y - badgePadding;
-          const badgeWidth = logoWidth + badgePadding * 2;
-          const badgeHeight = logoHeight + badgePadding * 2;
-          const borderRadius = 6;
-          
-          ctx.fillStyle = badgeColor;
-          ctx.beginPath();
-          ctx.moveTo(badgeX + borderRadius, badgeY);
-          ctx.lineTo(badgeX + badgeWidth - borderRadius, badgeY);
-          ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY, badgeX + badgeWidth, badgeY + borderRadius);
-          ctx.lineTo(badgeX + badgeWidth, badgeY + badgeHeight - borderRadius);
-          ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY + badgeHeight, badgeX + badgeWidth - borderRadius, badgeY + badgeHeight);
-          ctx.lineTo(badgeX + borderRadius, badgeY + badgeHeight);
-          ctx.quadraticCurveTo(badgeX, badgeY + badgeHeight, badgeX, badgeY + badgeHeight - borderRadius);
-          ctx.lineTo(badgeX, badgeY + borderRadius);
-          ctx.quadraticCurveTo(badgeX, badgeY, badgeX + borderRadius, badgeY);
-          ctx.closePath();
-          ctx.fill();
-        }
-        
+        // Apply opacity for watermark effect
+        ctx.globalAlpha = opacity;
         ctx.drawImage(logoImage, x, y, logoWidth, logoHeight);
+        ctx.globalAlpha = 1.0;
         
         const resultDataUrl = canvas.toDataURL("image/png");
         resolve(resultDataUrl);
