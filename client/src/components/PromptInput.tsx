@@ -12,10 +12,15 @@ interface PromptInputProps {
 
 export default function PromptInput({ prompts, onChange, disabled = false }: PromptInputProps) {
   const [lineCount, setLineCount] = useState(0);
+  const [charStats, setCharStats] = useState({ total: 0, avg: 0 });
 
   useEffect(() => {
     const lines = prompts.split('\n').filter(line => line.trim().length > 0);
     setLineCount(lines.length);
+    
+    const totalChars = lines.reduce((sum, line) => sum + line.trim().length, 0);
+    const avgChars = lines.length > 0 ? Math.round(totalChars / lines.length) : 0;
+    setCharStats({ total: totalChars, avg: avgChars });
   }, [prompts]);
 
   const handleClear = () => {
@@ -80,9 +85,16 @@ Elegant serum bottle with rose petals"
           disabled={disabled}
           data-testid="textarea-prompts"
         />
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="flex items-center justify-between text-sm text-muted-foreground flex-wrap gap-2">
           <span data-testid="text-line-count">{lineCount} prompt{lineCount !== 1 ? 's' : ''}</span>
-          <span className="text-xs">One prompt per line</span>
+          <div className="flex items-center gap-4 text-xs">
+            {lineCount > 0 && (
+              <span data-testid="text-char-stats">
+                ~{charStats.avg} chars/prompt
+              </span>
+            )}
+            <span>One prompt per line</span>
+          </div>
         </div>
       </CardContent>
     </Card>
