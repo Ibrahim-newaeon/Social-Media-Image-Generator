@@ -39,6 +39,22 @@ const defaultBrandStyle: BrandStyle = {
   logoDataUrl: "",
 };
 
+const TYPOGRAPHY_OPTIONS = [
+  { value: "Cormorant Garamond - Ultra-elegant, high contrast, fashion-forward", label: "Cormorant Garamond", description: "Ultra-elegant, high contrast, fashion-forward" },
+  { value: "Lora - Balanced serif, calligraphic roots, moderate contrast", label: "Lora", description: "Balanced serif, calligraphic roots, moderate contrast" },
+  { value: "Libre Baskerville - Classic traditional serif, strong readability", label: "Libre Baskerville", description: "Classic traditional serif, strong readability" },
+  { value: "Crimson Text - Book-style serif, gentle curves, scholarly", label: "Crimson Text", description: "Book-style serif, gentle curves, scholarly" },
+  { value: "Cinzel - Roman-inspired capitals, all-caps luxury feel", label: "Cinzel", description: "Roman-inspired capitals, all-caps luxury feel" },
+];
+
+const VISUAL_STYLE_OPTIONS = [
+  { value: "Minimalist Luxury - Clean white space, muted neutrals, subtle gold accents, refined simplicity", label: "Minimalist Luxury", description: "Clean white space, muted neutrals, subtle gold accents, refined simplicity" },
+  { value: "Romantic Editorial - Soft pastels, dreamy overlays, magazine-style layouts, organic textures", label: "Romantic Editorial", description: "Soft pastels, dreamy overlays, magazine-style layouts, organic textures" },
+  { value: "Modern Classic - Timeless black & white, structured grids, sophisticated contrast, editorial balance", label: "Modern Classic", description: "Timeless black & white, structured grids, sophisticated contrast, editorial balance" },
+  { value: "Botanical Elegance - Delicate florals, sage greens, cream tones, nature-inspired organic elements", label: "Botanical Elegance", description: "Delicate florals, sage greens, cream tones, nature-inspired organic elements" },
+  { value: "Parisian Chic - Soft blush & charcoal, vintage-inspired, café aesthetics, European sophistication", label: "Parisian Chic", description: "Soft blush & charcoal, vintage-inspired, café aesthetics, European sophistication" },
+];
+
 export function getDefaultBrandStyle(): BrandStyle {
   return { ...defaultBrandStyle };
 }
@@ -369,14 +385,25 @@ export default function BrandGuidelines({
                 <Type className="h-4 w-4" />
                 Typography / Font Style
               </Label>
-              <Input
-                id="fontStyle"
-                placeholder="e.g., Modern sans-serif, clean and minimal"
+              <Select
                 value={brandStyle.fontStyle}
-                onChange={(e) => handleChange("fontStyle", e.target.value)}
+                onValueChange={(value) => handleChange("fontStyle", value)}
                 disabled={disabled}
-                data-testid="input-font-style"
-              />
+              >
+                <SelectTrigger data-testid="select-font-style">
+                  <SelectValue placeholder="Select a typography style" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TYPOGRAPHY_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{option.label}</span>
+                        <span className="text-xs text-muted-foreground">{option.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -384,16 +411,25 @@ export default function BrandGuidelines({
                 <Sparkles className="h-4 w-4" />
                 Visual Style / Aesthetic
               </Label>
-              <Textarea
-                id="visualStyle"
-                placeholder="e.g., Professional, corporate, tech-forward with clean lines and subtle gradients"
+              <Select
                 value={brandStyle.visualStyle}
-                onChange={(e) => handleChange("visualStyle", e.target.value)}
+                onValueChange={(value) => handleChange("visualStyle", value)}
                 disabled={disabled}
-                className="resize-none"
-                rows={2}
-                data-testid="input-visual-style"
-              />
+              >
+                <SelectTrigger data-testid="select-visual-style">
+                  <SelectValue placeholder="Select a visual style" />
+                </SelectTrigger>
+                <SelectContent>
+                  {VISUAL_STYLE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{option.label}</span>
+                        <span className="text-xs text-muted-foreground">{option.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
