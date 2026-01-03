@@ -17,6 +17,13 @@ import {
   setActiveProfileName,
   type BrandProfile 
 } from "@/lib/brandProfilesStorage";
+import { 
+  getHistory, 
+  addToHistory, 
+  removeFromHistory, 
+  clearHistory,
+  type HistoryEntry 
+} from "@/lib/imageHistoryStorage";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -28,6 +35,8 @@ export default function Home() {
   const [previewImage, setPreviewImage] = useState<GeneratedImage | null>(null);
   const [brandStyle, setBrandStyle] = useState<BrandStyle>(getDefaultBrandStyle());
   const [savedProfiles, setSavedProfiles] = useState<BrandProfile[]>([]);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [activeTab, setActiveTab] = useState<"generated" | "history">("generated");
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus>({
     current: 0,
     total: 0,
@@ -39,6 +48,7 @@ export default function Home() {
 
   useEffect(() => {
     setSavedProfiles(getAllProfiles());
+    setHistory(getHistory());
     const activeProfile = loadActiveProfile();
     if (activeProfile) {
       setBrandStyle({
@@ -188,7 +198,7 @@ export default function Home() {
             imageUrl = await overlayLogoOnImage({
               logoDataUrl: brandStyle.logoDataUrl,
               imageDataUrl: imageUrl,
-              logoSizePercent: 6,
+              logoSizePercent: 25,
               paddingPercent: 3,
             });
           } catch (overlayError) {
@@ -203,6 +213,18 @@ export default function Home() {
               : img
           )
         );
+        
+        const historyEntry: HistoryEntry = {
+          id: image.id,
+          prompt: image.prompt,
+          imageDataUrl: imageUrl,
+          mimeType: "image/png",
+          generatedAt: Date.now(),
+          brandName: brandStyle.brandName || undefined,
+        };
+        addToHistory(historyEntry);
+        setHistory(getHistory());
+        
         completed++;
       } catch (error) {
         setImages((prev) =>
