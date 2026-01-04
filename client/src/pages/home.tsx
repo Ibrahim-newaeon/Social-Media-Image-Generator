@@ -7,6 +7,8 @@ import ImageGallery from "@/components/ImageGallery";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
 import BrandGuidelines, { BrandStyle, getDefaultBrandStyle, formatBrandStyleForPrompt } from "@/components/BrandGuidelines";
 import TargetAudience from "@/components/TargetAudience";
+import LogoUploader, { LogoSettings, getDefaultLogoSettings } from "@/components/LogoUploader";
+import ChatAssistant from "@/components/ChatAssistant";
 import { GeneratedImage } from "@/components/ImageCard";
 import { useToast } from "@/hooks/use-toast";
 import { overlayLogoOnImage } from "@/lib/logoOverlay";
@@ -28,21 +30,10 @@ import {
 } from "@/lib/imageHistoryStorage";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Download, Trash2, History, Images } from "lucide-react";
+import { Download, Trash2, History, Images, ImagePlus, Sparkles, Square, Moon, Sun, PanelLeftClose, PanelLeft } from "lucide-react";
 import { format } from "date-fns";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import {
-  ImagePlus,
-  Sparkles,
-  Square,
-  Moon,
-  Sun,
-  PanelLeftClose,
-  PanelLeft,
-} from "lucide-react";
 
 export default function Home() {
   // State
@@ -55,6 +46,16 @@ export default function Home() {
   const [savedProfiles, setSavedProfiles] = useState<BrandProfile[]>([]);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [activeTab, setActiveTab] = useState<"generated" | "history">("generated");
+  const [logoSettings, setLogoSettings] = useState<LogoSettings>(getDefaultLogoSettings());
+  const [isDark, setIsDark] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [genSettings, setGenSettings] = useState({
+    applyBrandColors: true,
+    applyAudienceRules: true,
+    applyLogoWatermark: true,
+    imagesPerPrompt: 1,
+  });
+  const [selectedAudience, setSelectedAudience] = useState<AudienceProfile | null>(null);
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus>({
     current: 0,
     total: 0,
@@ -664,8 +665,8 @@ export default function Home() {
               </TabsContent>
             </Tabs>
           </div>
-        </div>
-      </main>
+        </ScrollArea>
+      </aside>
 
       {/* Image Preview Modal */}
       <ImagePreviewModal
