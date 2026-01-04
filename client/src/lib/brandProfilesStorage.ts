@@ -7,6 +7,8 @@ export interface BrandProfile {
   targetGender: string;
   targetAgeRange: string;
   targetAudienceDescription: string;
+  selectedAudienceProfileId: string;
+  audiencePromptInsert: string;
   additionalNotes: string;
   logoDataUrl: string | null;
   lastModified: number;

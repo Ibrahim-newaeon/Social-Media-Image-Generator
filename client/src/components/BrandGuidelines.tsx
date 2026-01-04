@@ -17,6 +17,8 @@ export interface BrandStyle {
   targetGender: string;
   targetAgeRange: string;
   targetAudienceDescription: string;
+  selectedAudienceProfileId: string;
+  audiencePromptInsert: string;
   additionalNotes: string;
   logoDataUrl: string;
 }
@@ -41,6 +43,8 @@ const defaultBrandStyle: BrandStyle = {
   targetGender: "",
   targetAgeRange: "",
   targetAudienceDescription: "",
+  selectedAudienceProfileId: "",
+  audiencePromptInsert: "",
   additionalNotes: "",
   logoDataUrl: "",
 };
@@ -89,6 +93,9 @@ export function formatBrandStyleForPrompt(style: BrandStyle): string {
     if (style.targetAgeRange) audienceParts.push(`age ${style.targetAgeRange}`);
     if (style.targetAudienceDescription) audienceParts.push(style.targetAudienceDescription);
     parts.push(`Target audience: ${audienceParts.join(", ")}`);
+  }
+  if (style.audiencePromptInsert) {
+    parts.push(style.audiencePromptInsert);
   }
   if (style.additionalNotes) {
     parts.push(`Additional requirements: ${style.additionalNotes}`);

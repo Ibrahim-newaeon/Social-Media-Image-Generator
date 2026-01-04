@@ -67,6 +67,8 @@ export default function Home() {
         targetGender: activeProfile.targetGender || "",
         targetAgeRange: activeProfile.targetAgeRange || "",
         targetAudienceDescription: activeProfile.targetAudienceDescription || "",
+        selectedAudienceProfileId: activeProfile.selectedAudienceProfileId || "",
+        audiencePromptInsert: activeProfile.audiencePromptInsert || "",
         additionalNotes: activeProfile.additionalNotes,
         logoDataUrl: activeProfile.logoDataUrl || "",
       });
@@ -86,6 +88,8 @@ export default function Home() {
       targetGender: brandStyle.targetGender,
       targetAgeRange: brandStyle.targetAgeRange,
       targetAudienceDescription: brandStyle.targetAudienceDescription,
+      selectedAudienceProfileId: brandStyle.selectedAudienceProfileId,
+      audiencePromptInsert: brandStyle.audiencePromptInsert,
       additionalNotes: brandStyle.additionalNotes,
       logoDataUrl: brandStyle.logoDataUrl || null,
       lastModified: Date.now(),
@@ -115,6 +119,8 @@ export default function Home() {
         targetGender: profile.targetGender || "",
         targetAgeRange: profile.targetAgeRange || "",
         targetAudienceDescription: profile.targetAudienceDescription || "",
+        selectedAudienceProfileId: profile.selectedAudienceProfileId || "",
+        audiencePromptInsert: profile.audiencePromptInsert || "",
         additionalNotes: profile.additionalNotes,
         logoDataUrl: profile.logoDataUrl || "",
       });
@@ -422,12 +428,16 @@ export default function Home() {
                 targetGender: brandStyle.targetGender,
                 targetAgeRange: brandStyle.targetAgeRange,
                 targetAudienceDescription: brandStyle.targetAudienceDescription,
+                selectedAudienceProfileId: brandStyle.selectedAudienceProfileId,
+                audiencePromptInsert: brandStyle.audiencePromptInsert,
               }}
               onChange={(audienceData) => setBrandStyle(prev => ({
                 ...prev,
                 targetGender: audienceData.targetGender,
                 targetAgeRange: audienceData.targetAgeRange,
                 targetAudienceDescription: audienceData.targetAudienceDescription,
+                selectedAudienceProfileId: audienceData.selectedAudienceProfileId,
+                audiencePromptInsert: audienceData.audiencePromptInsert,
               }))}
               disabled={isGenerating}
             />
