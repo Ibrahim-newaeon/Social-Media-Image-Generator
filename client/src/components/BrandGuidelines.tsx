@@ -22,6 +22,11 @@ export interface BrandStyle {
   additionalNotes: string;
   targetAudience: string;
   logoDataUrl: string;
+  // New generic audience fields
+  targetLocation: string;
+  targetIncome: string;
+  targetInterests: string;
+  targetLanguage: string;
 }
 
 interface BrandGuidelinesProps {
@@ -49,6 +54,10 @@ const defaultBrandStyle: BrandStyle = {
   additionalNotes: "",
   targetAudience: "",
   logoDataUrl: "",
+  targetLocation: "",
+  targetIncome: "",
+  targetInterests: "",
+  targetLanguage: "",
 };
 
 const TYPOGRAPHY_OPTIONS = [

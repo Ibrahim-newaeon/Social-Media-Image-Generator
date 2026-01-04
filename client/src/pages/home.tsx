@@ -89,6 +89,10 @@ export default function Home() {
         additionalNotes: activeProfile.additionalNotes,
         targetAudience: activeProfile.targetAudience || "",
         logoDataUrl: activeProfile.logoDataUrl || "",
+        targetLocation: activeProfile.targetLocation || "",
+        targetIncome: activeProfile.targetIncome || "",
+        targetInterests: activeProfile.targetInterests || "",
+        targetLanguage: activeProfile.targetLanguage || "",
       });
       if (activeProfile.logoDataUrl) {
         setLogoSettings(prev => ({ ...prev, url: activeProfile.logoDataUrl || "" }));
@@ -122,6 +126,10 @@ export default function Home() {
       targetAudience: brandStyle.targetAudience,
       logoDataUrl: logoSettings.url || null,
       lastModified: Date.now(),
+      targetLocation: brandStyle.targetLocation,
+      targetIncome: brandStyle.targetIncome,
+      targetInterests: brandStyle.targetInterests,
+      targetLanguage: brandStyle.targetLanguage,
     };
 
     setBrandStyle(prev => ({ ...prev, brandName: trimmedName }));
@@ -153,6 +161,10 @@ export default function Home() {
         additionalNotes: profile.additionalNotes,
         targetAudience: profile.targetAudience || "",
         logoDataUrl: profile.logoDataUrl || "",
+        targetLocation: profile.targetLocation || "",
+        targetIncome: profile.targetIncome || "",
+        targetInterests: profile.targetInterests || "",
+        targetLanguage: profile.targetLanguage || "",
       });
       if (profile.logoDataUrl) {
         setLogoSettings(prev => ({ ...prev, url: profile.logoDataUrl || "" }));
@@ -457,6 +469,10 @@ export default function Home() {
                 targetAudienceDescription: brandStyle.targetAudienceDescription,
                 selectedAudienceProfileId: brandStyle.selectedAudienceProfileId,
                 audiencePromptInsert: brandStyle.audiencePromptInsert,
+                targetLocation: brandStyle.targetLocation,
+                targetIncome: brandStyle.targetIncome,
+                targetInterests: brandStyle.targetInterests,
+                targetLanguage: brandStyle.targetLanguage,
               }}
               onChange={(audienceData) => setBrandStyle(prev => ({
                 ...prev,
@@ -465,6 +481,10 @@ export default function Home() {
                 targetAudienceDescription: audienceData.targetAudienceDescription,
                 selectedAudienceProfileId: audienceData.selectedAudienceProfileId,
                 audiencePromptInsert: audienceData.audiencePromptInsert,
+                targetLocation: audienceData.targetLocation,
+                targetIncome: audienceData.targetIncome,
+                targetInterests: audienceData.targetInterests,
+                targetLanguage: audienceData.targetLanguage,
               }))}
               disabled={isGenerating}
             />
