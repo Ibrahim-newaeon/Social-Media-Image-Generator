@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { FileText, Trash2, Sparkles, Loader2, Wand2 } from "lucide-react";
 import type { BrandStyle } from "./BrandGuidelines";
 
@@ -21,6 +22,7 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [showPromptCountDialog, setShowPromptCountDialog] = useState(false);
   const [promptCount, setPromptCount] = useState(10);
+  const { toast } = useToast();
 
   useEffect(() => {
     const lines = prompts.split('\n').filter(line => line.trim().length > 0);
@@ -101,10 +103,24 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
       }
     } catch (error) {
       console.error("Error loading suggestions:", error);
-      const fallbackPrompts = `Professional product photography with brand colors, clean composition, and premium feel.
-Lifestyle imagery featuring target audience, authentic moments, and brand personality.
-Creative flat lay with products and complementary props, artistic styling, and cohesive color palette.`;
-      onChange(fallbackPrompts);
+      toast({
+        title: "AI Suggest failed",
+        description: "Could not connect to AI. Check if GEMINI_API_KEY is set. Using sample prompts instead.",
+        variant: "destructive",
+      });
+      // Provide detailed fallback prompts
+      const brand = brandStyle?.brandName || "your brand";
+      const colors = brandStyle?.primaryColors || "brand colors";
+      const style = brandStyle?.visualStyle || "modern minimalist";
+      const audience = brandStyle?.targetAudience || "target customers";
+      const fallbackPrompts = [
+        `Elegant ${style} product photography featuring ${brand} products on a clean marble surface, soft diffused natural lighting from large window, ${colors} color accents, shallow depth of field, Instagram-ready square composition.`,
+        `Lifestyle scene showing young professional using ${brand} products in a beautifully designed home office, morning golden hour light streaming through sheer curtains, authentic candid moment, aspirational yet relatable for ${audience}.`,
+        `Artistic flat lay arrangement of ${brand} products with complementary props like fresh eucalyptus branches and linen textures, overhead shot with dramatic shadows, cohesive ${colors} color palette, premium aesthetic.`,
+        `Close-up macro shot highlighting the texture and quality of ${brand} product packaging, studio lighting with soft gradients, ${style} background, focus on craftsmanship details that appeal to ${audience}.`,
+        `Behind-the-scenes creative workspace featuring ${brand} mood boards, fabric swatches in ${colors}, design sketches, showing the creative process and brand story, natural light with warm tones.`,
+      ];
+      onChange(fallbackPrompts.slice(0, promptCount).join("\n"));
     } finally {
       setIsLoadingSuggestions(false);
     }
