@@ -5,6 +5,7 @@ export interface BrandProfile {
   fontStyle: string;
   visualStyle: string;
   additionalNotes: string;
+  targetAudience: string;
   logoDataUrl: string | null;
   lastModified: number;
 }

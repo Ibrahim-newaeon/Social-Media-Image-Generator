@@ -48,6 +48,7 @@ export default function Home() {
         fontStyle: activeProfile.fontStyle,
         visualStyle: activeProfile.visualStyle,
         additionalNotes: activeProfile.additionalNotes,
+        targetAudience: activeProfile.targetAudience || "",
         logoDataUrl: activeProfile.logoDataUrl || "",
       });
     }
@@ -56,7 +57,7 @@ export default function Home() {
   const handleSaveProfile = () => {
     const trimmedName = brandStyle.brandName.trim();
     if (!trimmedName) return;
-    
+
     const profile: BrandProfile = {
       brandName: trimmedName,
       primaryColor: brandStyle.primaryColors,
@@ -64,6 +65,7 @@ export default function Home() {
       fontStyle: brandStyle.fontStyle,
       visualStyle: brandStyle.visualStyle,
       additionalNotes: brandStyle.additionalNotes,
+      targetAudience: brandStyle.targetAudience,
       logoDataUrl: brandStyle.logoDataUrl || null,
       lastModified: Date.now(),
     };
@@ -90,6 +92,7 @@ export default function Home() {
         fontStyle: profile.fontStyle,
         visualStyle: profile.visualStyle,
         additionalNotes: profile.additionalNotes,
+        targetAudience: profile.targetAudience || "",
         logoDataUrl: profile.logoDataUrl || "",
       });
       setActiveProfileName(profile.brandName);
@@ -350,6 +353,7 @@ export default function Home() {
               prompts={prompts}
               onChange={setPrompts}
               disabled={isGenerating}
+              brandStyle={brandStyle}
             />
             <GenerateControls
               onGenerate={handleGenerate}
