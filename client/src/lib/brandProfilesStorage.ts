@@ -4,6 +4,9 @@ export interface BrandProfile {
   secondaryColor: string;
   fontStyle: string;
   visualStyle: string;
+  targetGender: string;
+  targetAgeRange: string;
+  targetAudienceDescription: string;
   additionalNotes: string;
   logoDataUrl: string | null;
   lastModified: number;
