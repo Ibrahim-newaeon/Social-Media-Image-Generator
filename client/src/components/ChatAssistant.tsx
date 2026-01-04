@@ -128,8 +128,8 @@ export default function ChatAssistant({ onSendMessage }: ChatAssistantProps) {
           </div>
 
           {/* Messages */}
-          <ScrollArea className="h-80 p-4" ref={scrollRef}>
-            <div className="space-y-4">
+          <ScrollArea className="h-80 p-4">
+            <div className="space-y-4" ref={scrollRef}>
               {messages.map((msg, idx) => (
                 <div
                   key={idx}

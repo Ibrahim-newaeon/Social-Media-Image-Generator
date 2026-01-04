@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PromptInput from "@/components/PromptInput";
 import GenerationProgress, { GenerationStatus } from "@/components/GenerationProgress";
 import ImageGallery from "@/components/ImageGallery";
@@ -12,7 +14,6 @@ import ChatAssistant from "@/components/ChatAssistant";
 import { GeneratedImage } from "@/components/ImageCard";
 import { useToast } from "@/hooks/use-toast";
 import { overlayLogoOnImage } from "@/lib/logoOverlay";
-import { type AudienceProfile } from "@/data/audiences";
 import {
   getAllProfiles,
   saveProfile,
@@ -21,12 +22,12 @@ import {
   setActiveProfileName,
   type BrandProfile
 } from "@/lib/brandProfilesStorage";
-import { 
-  getHistory, 
-  addToHistory, 
-  removeFromHistory, 
+import {
+  getHistory,
+  addToHistory,
+  removeFromHistory,
   clearHistory,
-  type HistoryEntry 
+  type HistoryEntry
 } from "@/lib/imageHistoryStorage";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -44,6 +45,9 @@ export default function Home() {
   const [previewImage, setPreviewImage] = useState<GeneratedImage | null>(null);
   const [brandStyle, setBrandStyle] = useState<BrandStyle>(getDefaultBrandStyle());
   const [savedProfiles, setSavedProfiles] = useState<BrandProfile[]>([]);
+  const [logoSettings, setLogoSettings] = useState<LogoSettings>(getDefaultLogoSettings());
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [activeTab, setActiveTab] = useState<"generated" | "history">("generated");
   const [logoSettings, setLogoSettings] = useState<LogoSettings>(getDefaultLogoSettings());
@@ -127,7 +131,7 @@ export default function Home() {
 
     toast({
       title: "Profile saved",
-      description: `Brand profile "${profile.brandName}" has been saved (includes brand style and target audience).`,
+      description: `Brand profile "${profile.brandName}" has been saved.`,
     });
   };
 
@@ -182,23 +186,17 @@ export default function Home() {
       .filter((line) => line.length > 0);
   }, [prompts]);
 
-  // Build enhanced prompt with brand + audience
+  // Build enhanced prompt with brand
   const buildEnhancedPrompt = (basePrompt: string): string => {
     let enhancedPrompt = basePrompt;
-
-    // Add brand context
-    if (genSettings.applyBrandColors) {
-      const brandPrefix = formatBrandStyleForPrompt(brandStyle);
-      if (brandPrefix) {
-        enhancedPrompt = brandPrefix + enhancedPrompt;
-      }
+    const brandPrefix = formatBrandStyleForPrompt(brandStyle);
+    if (brandPrefix) {
+      enhancedPrompt = brandPrefix + enhancedPrompt;
     }
-
-    // Add audience requirements
-    if (genSettings.applyAudienceRules && selectedAudience) {
-      enhancedPrompt += `\n\n${selectedAudience.promptAddition}`;
+    // Add audience prompt insert if available
+    if (brandStyle.audiencePromptInsert) {
+      enhancedPrompt += `\n\n${brandStyle.audiencePromptInsert}`;
     }
-
     return enhancedPrompt;
   };
 
@@ -217,23 +215,16 @@ export default function Home() {
     setIsGenerating(true);
     shouldStopRef.current = false;
 
-    const totalImages = promptList.length * genSettings.imagesPerPrompt;
-    const initialImages: GeneratedImage[] = [];
-
-    for (let i = 0; i < promptList.length; i++) {
-      for (let j = 0; j < genSettings.imagesPerPrompt; j++) {
-        initialImages.push({
-          id: `img-${Date.now()}-${i}-${j}`,
-          prompt: promptList[i],
-          status: "pending",
-        });
-      }
-    }
+    const initialImages: GeneratedImage[] = promptList.map((prompt, i) => ({
+      id: `img-${Date.now()}-${i}`,
+      prompt,
+      status: "pending" as const,
+    }));
 
     setImages(initialImages);
     setGenerationStatus({
       current: 0,
-      total: totalImages,
+      total: promptList.length,
       completed: 0,
       failed: 0,
     });
@@ -275,12 +266,12 @@ export default function Home() {
         let imageUrl = `data:${data.mimeType};base64,${data.b64_json}`;
 
         // Apply logo watermark if enabled
-        if (genSettings.applyLogoWatermark && logoSettings.url) {
+        if (logoSettings.url) {
           try {
             imageUrl = await overlayLogoOnImage({
               logoDataUrl: logoSettings.url,
               imageDataUrl: imageUrl,
-              logoSizePercent: 25,
+              logoSizePercent: logoSettings.size,
               paddingPercent: 3,
               position: logoSettings.position,
               opacity: logoSettings.opacity,
@@ -297,7 +288,8 @@ export default function Home() {
               : img
           )
         );
-        
+
+        // Add to history
         const historyEntry: HistoryEntry = {
           id: image.id,
           prompt: image.prompt,
@@ -308,7 +300,7 @@ export default function Home() {
         };
         addToHistory(historyEntry);
         setHistory(getHistory());
-        
+
         completed++;
       } catch (error) {
         setImages((prev) =>
@@ -453,7 +445,7 @@ export default function Home() {
 
   const handleDownloadFromHistory = (entry: HistoryEntry) => {
     if (!entry.imageDataUrl) return;
-    
+
     try {
       const blob = base64ToBlob(entry.imageDataUrl);
       saveAs(blob, `image-${entry.id}.png`);
@@ -512,6 +504,7 @@ export default function Home() {
               onDeleteProfile={handleDeleteProfile}
               onNewProfile={handleNewProfile}
             />
+
             <TargetAudience
               data={{
                 targetGender: brandStyle.targetGender,
@@ -530,11 +523,6 @@ export default function Home() {
               }))}
               disabled={isGenerating}
             />
-            <PromptInput
-              prompts={prompts}
-              onChange={setPrompts}
-              disabled={isGenerating}
-            />
 
             <LogoUploader
               settings={logoSettings}
@@ -542,128 +530,215 @@ export default function Home() {
               disabled={isGenerating}
             />
           </div>
-          
-          <div>
-            <Tabs 
-              value={activeTab} 
-              onValueChange={(value) => setActiveTab(value as "generated" | "history")}
-              data-testid="tabs-gallery"
+        </ScrollArea>
+
+        {/* Generate Button */}
+        <div className="p-4 border-t space-y-3">
+          {!isGenerating ? (
+            <Button
+              onClick={handleGenerate}
+              disabled={promptCount === 0}
+              className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg"
             >
-              <TabsList className="mb-4" data-testid="tabs-list">
-                <TabsTrigger value="generated" data-testid="tab-generated">
-                  <Images className="w-4 h-4 mr-2" />
-                  Generated
-                </TabsTrigger>
-                <TabsTrigger value="history" data-testid="tab-history">
-                  <History className="w-4 h-4 mr-2" />
-                  History
-                  {history.length > 0 && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      ({history.length})
-                    </span>
-                  )}
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="generated" data-testid="tab-content-generated">
-                <ImageGallery
-                  images={images}
-                  onDownload={handleDownload}
-                  onDownloadAll={handleDownloadAll}
-                  onClearAll={handleClearAll}
-                  onPreview={setPreviewImage}
-                  isDownloading={isDownloading}
-                />
-              </TabsContent>
-              
-              <TabsContent value="history" data-testid="tab-content-history">
-                <div className="h-full flex flex-col" data-testid="div-history">
-                  <div className="pb-4 flex items-center justify-between gap-4 flex-wrap">
-                    <div className="flex items-center gap-2">
-                      <History className="w-5 h-5 text-muted-foreground" />
-                      <h3 className="text-lg font-semibold">History</h3>
+              <Sparkles className="w-5 h-5 mr-2" />
+              Generate {promptCount > 0 ? `${promptCount} Images` : "Images"}
+            </Button>
+          ) : (
+            <Button
+              onClick={handleStop}
+              variant="destructive"
+              className="w-full h-12 text-lg font-semibold"
+            >
+              <Square className="w-4 h-4 mr-2" />
+              Stop Generation
+            </Button>
+          )}
+
+          {totalGenerated > 0 && (
+            <div className="text-center text-sm text-muted-foreground">
+              <span className="font-bold text-primary">{totalGenerated}</span> images generated
+            </div>
+          )}
+        </div>
+
+        {/* Theme Toggle */}
+        <div className="p-3 border-t">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start"
+            onClick={toggleTheme}
+          >
+            {isDark ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
+            {isDark ? "Light Mode" : "Dark Mode"}
+          </Button>
+        </div>
+      </aside>
+
+      {/* Collapse Button (when sidebar is hidden) */}
+      {sidebarCollapsed && (
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setSidebarCollapsed(false)}
+          className="fixed top-4 left-4 z-50 shadow-lg"
+        >
+          <PanelLeft className="w-4 h-4" />
+        </Button>
+      )}
+
+      {/* Main Content */}
+      <main className="flex-1 min-h-screen">
+        {/* Top Bar */}
+        <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Create Images</h2>
+              <p className="text-sm text-muted-foreground">
+                Enter your prompts and generate AI images in bulk
+              </p>
+            </div>
+            {isGenerating && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Sparkles className="w-4 h-4 animate-pulse text-primary" />
+                <span>Generating...</span>
+              </div>
+            )}
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <div className="p-6 space-y-6">
+          <div className="grid xl:grid-cols-2 gap-6">
+            {/* Left Column - Prompts & Progress */}
+            <div className="space-y-6">
+              <PromptInput
+                prompts={prompts}
+                onChange={setPrompts}
+                disabled={isGenerating}
+                brandStyle={brandStyle}
+              />
+
+              <GenerationProgress
+                status={generationStatus}
+                isVisible={isGenerating || generationStatus.total > 0}
+              />
+            </div>
+
+            {/* Right Column - Gallery with Tabs */}
+            <div>
+              <Tabs
+                value={activeTab}
+                onValueChange={(value) => setActiveTab(value as "generated" | "history")}
+              >
+                <TabsList className="mb-4">
+                  <TabsTrigger value="generated">
+                    <Images className="w-4 h-4 mr-2" />
+                    Generated
+                  </TabsTrigger>
+                  <TabsTrigger value="history">
+                    <History className="w-4 h-4 mr-2" />
+                    History
+                    {history.length > 0 && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        ({history.length})
+                      </span>
+                    )}
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="generated">
+                  <ImageGallery
+                    images={images}
+                    onDownload={handleDownload}
+                    onDownloadAll={handleDownloadAll}
+                    onClearAll={handleClearAll}
+                    onPreview={setPreviewImage}
+                    isDownloading={isDownloading}
+                  />
+                </TabsContent>
+
+                <TabsContent value="history">
+                  <div className="h-full flex flex-col">
+                    <div className="pb-4 flex items-center justify-between gap-4 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <History className="w-5 h-5 text-muted-foreground" />
+                        <h3 className="text-lg font-semibold">History</h3>
+                        {history.length > 0 && (
+                          <span className="text-sm font-normal text-muted-foreground">
+                            ({history.length} items)
+                          </span>
+                        )}
+                      </div>
                       {history.length > 0 && (
-                        <span className="text-sm font-normal text-muted-foreground">
-                          ({history.length} items)
-                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleClearHistory}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Clear All History
+                        </Button>
                       )}
                     </div>
-                    {history.length > 0 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleClearHistory}
-                        data-testid="button-clear-history"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Clear All History
-                      </Button>
-                    )}
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    {history.length === 0 ? (
-                      <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground py-12" data-testid="history-empty-state">
-                        <History className="w-16 h-16 mb-4 opacity-20" />
-                        <p className="text-lg font-medium">No history yet</p>
-                        <p className="text-sm mt-1">Generated images will appear here</p>
-                      </div>
-                    ) : (
-                      <ScrollArea className="h-[calc(100vh-300px)]">
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
-                          {history.map((entry) => (
-                            <Card key={entry.id} className="overflow-hidden" data-testid={`card-history-${entry.id}`}>
-                              <div className="relative aspect-square">
-                                <img 
-                                  src={entry.imageDataUrl} 
-                                  alt={entry.prompt}
-                                  className="w-full h-full object-cover"
-                                  data-testid={`img-history-${entry.id}`}
-                                />
-                              </div>
-                              <div className="p-3 space-y-2">
-                                <p 
-                                  className="text-sm line-clamp-2" 
-                                  title={entry.prompt}
-                                  data-testid={`text-prompt-${entry.id}`}
-                                >
-                                  {entry.prompt}
-                                </p>
-                                <div className="flex items-center justify-between gap-2">
-                                  <span 
-                                    className="text-xs text-muted-foreground"
-                                    data-testid={`text-date-${entry.id}`}
+                    <div className="flex-1 overflow-hidden">
+                      {history.length === 0 ? (
+                        <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground py-12">
+                          <History className="w-16 h-16 mb-4 opacity-20" />
+                          <p className="text-lg font-medium">No history yet</p>
+                          <p className="text-sm mt-1">Generated images will appear here</p>
+                        </div>
+                      ) : (
+                        <ScrollArea className="h-[calc(100vh-300px)]">
+                          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                            {history.map((entry) => (
+                              <Card key={entry.id} className="overflow-hidden">
+                                <div className="relative aspect-square">
+                                  <img
+                                    src={entry.imageDataUrl}
+                                    alt={entry.prompt}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="p-3 space-y-2">
+                                  <p
+                                    className="text-sm line-clamp-2"
+                                    title={entry.prompt}
                                   >
-                                    {format(new Date(entry.generatedAt), "MMM d, yyyy h:mm a")}
-                                  </span>
-                                  <div className="flex items-center gap-1">
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => handleDownloadFromHistory(entry)}
-                                      data-testid={`button-download-history-${entry.id}`}
-                                    >
-                                      <Download className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => handleRemoveFromHistory(entry.id)}
-                                      data-testid={`button-delete-history-${entry.id}`}
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
+                                    {entry.prompt}
+                                  </p>
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-xs text-muted-foreground">
+                                      {format(new Date(entry.generatedAt), "MMM d, yyyy h:mm a")}
+                                    </span>
+                                    <div className="flex items-center gap-1">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleDownloadFromHistory(entry)}
+                                      >
+                                        <Download className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleRemoveFromHistory(entry.id)}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </Button>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </Card>
-                          ))}
-                        </div>
-                      </ScrollArea>
-                    )}
+                              </Card>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </TabsContent>
-            </Tabs>
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
         </ScrollArea>
       </aside>
