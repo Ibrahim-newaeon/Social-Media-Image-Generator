@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus, Users } from "lucide-react";
+import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus } from "lucide-react";
 import { useState, useRef, type ChangeEvent } from "react";
 import type { BrandProfile } from "@/lib/brandProfilesStorage";
 
@@ -466,26 +466,6 @@ export default function BrandGuidelines({
                 rows={2}
                 data-testid="input-additional-notes"
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="targetAudience" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Target Audience
-              </Label>
-              <Textarea
-                id="targetAudience"
-                placeholder="e.g., Young professionals aged 25-35, health-conscious millennials, luxury shoppers, small business owners"
-                value={brandStyle.targetAudience}
-                onChange={(e) => handleChange("targetAudience", e.target.value)}
-                disabled={disabled}
-                className="resize-none"
-                rows={2}
-                data-testid="input-target-audience"
-              />
-              <p className="text-xs text-muted-foreground">
-                Define your target audience to generate more relevant image prompts
-              </p>
             </div>
           </div>
         </CardContent>
