@@ -3,7 +3,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Users, ChevronDown, ChevronUp, Globe, MapPin } from "lucide-react";
 import { useState } from "react";
 
@@ -184,49 +183,49 @@ export default function TargetAudience({
       {isExpanded && (
         <CardContent className="space-y-4">
           {/* Demographics Row */}
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="targetGender">Gender</Label>
-              <Select
+              <Input
+                id="targetGender"
+                list="gender-options"
+                placeholder="Select or type"
                 value={data.targetGender}
-                onValueChange={(value) => handleChange("targetGender", value)}
+                onChange={(e) => handleChange("targetGender", e.target.value)}
                 disabled={disabled}
-              >
-                <SelectTrigger data-testid="select-target-gender">
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  {GENDER_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                data-testid="input-target-gender"
+              />
+              <datalist id="gender-options">
+                {GENDER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </datalist>
             </div>
             <div className="space-y-2">
               <Label htmlFor="targetAgeRange">Age Range</Label>
-              <Select
+              <Input
+                id="targetAgeRange"
+                list="age-options"
+                placeholder="Select or type"
                 value={data.targetAgeRange}
-                onValueChange={(value) => handleChange("targetAgeRange", value)}
+                onChange={(e) => handleChange("targetAgeRange", e.target.value)}
                 disabled={disabled}
-              >
-                <SelectTrigger data-testid="select-target-age">
-                  <SelectValue placeholder="Select age range" />
-                </SelectTrigger>
-                <SelectContent>
-                  {AGE_RANGE_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                data-testid="input-target-age"
+              />
+              <datalist id="age-options">
+                {AGE_RANGE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </datalist>
             </div>
           </div>
 
           {/* Location & Income Row */}
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="targetLocation" className="flex items-center gap-2">
                 <MapPin className="h-3 w-3" />
@@ -234,7 +233,7 @@ export default function TargetAudience({
               </Label>
               <Input
                 id="targetLocation"
-                placeholder="e.g., USA, GCC, Europe, Global"
+                placeholder="e.g., USA, GCC, Europe"
                 value={data.targetLocation || ""}
                 onChange={(e) => handleChange("targetLocation", e.target.value)}
                 disabled={disabled}
@@ -243,22 +242,22 @@ export default function TargetAudience({
             </div>
             <div className="space-y-2">
               <Label htmlFor="targetIncome">Income Level</Label>
-              <Select
+              <Input
+                id="targetIncome"
+                list="income-options"
+                placeholder="Select or type"
                 value={data.targetIncome || ""}
-                onValueChange={(value) => handleChange("targetIncome", value)}
+                onChange={(e) => handleChange("targetIncome", e.target.value)}
                 disabled={disabled}
-              >
-                <SelectTrigger data-testid="select-target-income">
-                  <SelectValue placeholder="Select income level" />
-                </SelectTrigger>
-                <SelectContent>
-                  {INCOME_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                data-testid="input-target-income"
+              />
+              <datalist id="income-options">
+                {INCOME_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </datalist>
             </div>
           </div>
 
@@ -268,22 +267,22 @@ export default function TargetAudience({
               <Globe className="h-3 w-3" />
               Primary Language
             </Label>
-            <Select
+            <Input
+              id="targetLanguage"
+              list="language-options"
+              placeholder="Select or type a language"
               value={data.targetLanguage || ""}
-              onValueChange={(value) => handleChange("targetLanguage", value)}
+              onChange={(e) => handleChange("targetLanguage", e.target.value)}
               disabled={disabled}
-            >
-              <SelectTrigger data-testid="select-target-language">
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                {LANGUAGE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              data-testid="input-target-language"
+            />
+            <datalist id="language-options">
+              {LANGUAGE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </datalist>
           </div>
 
           {/* Interests */}

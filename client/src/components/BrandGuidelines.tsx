@@ -3,7 +3,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus, MapPin, DollarSign } from "lucide-react";
 import { useState, useRef, type ChangeEvent } from "react";
 import type { BrandProfile } from "@/lib/brandProfilesStorage";
@@ -430,25 +429,25 @@ export default function BrandGuidelines({
                 <Type className="h-4 w-4" />
                 Typography / Font Style
               </Label>
-              <Select
+              <Input
+                id="fontStyle"
+                list="fontStyle-options"
+                placeholder="Select or type a typography style"
                 value={brandStyle.fontStyle}
-                onValueChange={(value) => handleChange("fontStyle", value)}
+                onChange={(e) => handleChange("fontStyle", e.target.value)}
                 disabled={disabled}
-              >
-                <SelectTrigger data-testid="select-font-style">
-                  <SelectValue placeholder="Select a typography style" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TYPOGRAPHY_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{option.label}</span>
-                        <span className="text-xs text-muted-foreground">{option.description}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                data-testid="input-font-style"
+              />
+              <datalist id="fontStyle-options">
+                {TYPOGRAPHY_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label} - {option.description}
+                  </option>
+                ))}
+              </datalist>
+              <p className="text-xs text-muted-foreground">
+                Select from suggestions or type your own style
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -456,25 +455,25 @@ export default function BrandGuidelines({
                 <Sparkles className="h-4 w-4" />
                 Visual Style / Aesthetic
               </Label>
-              <Select
+              <Input
+                id="visualStyle"
+                list="visualStyle-options"
+                placeholder="Select or type a visual style"
                 value={brandStyle.visualStyle}
-                onValueChange={(value) => handleChange("visualStyle", value)}
+                onChange={(e) => handleChange("visualStyle", e.target.value)}
                 disabled={disabled}
-              >
-                <SelectTrigger data-testid="select-visual-style">
-                  <SelectValue placeholder="Select a visual style" />
-                </SelectTrigger>
-                <SelectContent>
-                  {VISUAL_STYLE_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{option.label}</span>
-                        <span className="text-xs text-muted-foreground">{option.description}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                data-testid="input-visual-style"
+              />
+              <datalist id="visualStyle-options">
+                {VISUAL_STYLE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label} - {option.description}
+                  </option>
+                ))}
+              </datalist>
+              <p className="text-xs text-muted-foreground">
+                Select from suggestions or type your own style
+              </p>
             </div>
 
             {/* Location & Income Level */}
@@ -499,25 +498,22 @@ export default function BrandGuidelines({
                   <DollarSign className="h-4 w-4" />
                   Target Income Level
                 </Label>
-                <Select
+                <Input
+                  id="targetIncome"
+                  list="targetIncome-options"
+                  placeholder="Select or type income level"
                   value={brandStyle.targetIncome}
-                  onValueChange={(value) => handleChange("targetIncome", value)}
+                  onChange={(e) => handleChange("targetIncome", e.target.value)}
                   disabled={disabled}
-                >
-                  <SelectTrigger data-testid="select-income-level">
-                    <SelectValue placeholder="Select income level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {INCOME_LEVEL_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{option.label}</span>
-                          <span className="text-xs text-muted-foreground">{option.description}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  data-testid="input-income-level"
+                />
+                <datalist id="targetIncome-options">
+                  {INCOME_LEVEL_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label} - {option.description}
+                    </option>
+                  ))}
+                </datalist>
               </div>
             </div>
 
