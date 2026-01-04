@@ -98,7 +98,7 @@ export default function Home() {
     
     toast({
       title: "Profile saved",
-      description: `Brand profile "${profile.brandName}" has been saved.`,
+      description: `Brand profile "${profile.brandName}" has been saved (includes brand style and target audience).`,
     });
   };
 

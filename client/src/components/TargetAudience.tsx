@@ -58,10 +58,13 @@ export default function TargetAudience({
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Users className="h-5 w-5 text-muted-foreground" />
-            Target Audience
-          </CardTitle>
+          <div>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Users className="h-5 w-5 text-muted-foreground" />
+              Target Audience
+            </CardTitle>
+            <p className="text-xs text-muted-foreground mt-1">Saved with your brand profile</p>
+          </div>
           <div className="flex items-center gap-2 flex-wrap">
             {hasContent && (
               <Button

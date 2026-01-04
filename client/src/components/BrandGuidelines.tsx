@@ -357,7 +357,7 @@ export default function BrandGuidelines({
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                Enter a brand name and click save to store this profile for later use
+                Enter a brand name and click save to store this profile (includes target audience settings)
               </p>
             </div>
 
