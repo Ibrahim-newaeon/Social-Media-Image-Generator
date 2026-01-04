@@ -4,6 +4,11 @@ export interface BrandProfile {
   secondaryColor: string;
   fontStyle: string;
   visualStyle: string;
+  targetGender: string;
+  targetAgeRange: string;
+  targetAudienceDescription: string;
+  selectedAudienceProfileId: string;
+  audiencePromptInsert: string;
   additionalNotes: string;
   targetAudience: string;
   logoDataUrl: string | null;

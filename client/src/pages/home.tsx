@@ -6,10 +6,7 @@ import GenerationProgress, { GenerationStatus } from "@/components/GenerationPro
 import ImageGallery from "@/components/ImageGallery";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
 import BrandGuidelines, { BrandStyle, getDefaultBrandStyle, formatBrandStyleForPrompt } from "@/components/BrandGuidelines";
-import AudienceSelector from "@/components/AudienceSelector";
-import LogoUploader, { LogoSettings, getDefaultLogoSettings } from "@/components/LogoUploader";
-import GenerationSettings, { GenerationSettingsData, getDefaultGenerationSettings } from "@/components/GenerationSettings";
-import ChatAssistant from "@/components/ChatAssistant";
+import TargetAudience from "@/components/TargetAudience";
 import { GeneratedImage } from "@/components/ImageCard";
 import { useToast } from "@/hooks/use-toast";
 import { overlayLogoOnImage } from "@/lib/logoOverlay";
@@ -22,6 +19,19 @@ import {
   setActiveProfileName,
   type BrandProfile
 } from "@/lib/brandProfilesStorage";
+import { 
+  getHistory, 
+  addToHistory, 
+  removeFromHistory, 
+  clearHistory,
+  type HistoryEntry 
+} from "@/lib/imageHistoryStorage";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Download, Trash2, History, Images } from "lucide-react";
+import { format } from "date-fns";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import {
@@ -43,11 +53,8 @@ export default function Home() {
   const [previewImage, setPreviewImage] = useState<GeneratedImage | null>(null);
   const [brandStyle, setBrandStyle] = useState<BrandStyle>(getDefaultBrandStyle());
   const [savedProfiles, setSavedProfiles] = useState<BrandProfile[]>([]);
-  const [selectedAudience, setSelectedAudience] = useState<AudienceProfile | null>(null);
-  const [logoSettings, setLogoSettings] = useState<LogoSettings>(getDefaultLogoSettings());
-  const [genSettings, setGenSettings] = useState<GenerationSettingsData>(getDefaultGenerationSettings());
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [activeTab, setActiveTab] = useState<"generated" | "history">("generated");
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus>({
     current: 0,
     total: 0,
@@ -60,6 +67,7 @@ export default function Home() {
   // Load saved profile on mount
   useEffect(() => {
     setSavedProfiles(getAllProfiles());
+    setHistory(getHistory());
     const activeProfile = loadActiveProfile();
     if (activeProfile) {
       setBrandStyle({
@@ -68,6 +76,11 @@ export default function Home() {
         secondaryColors: activeProfile.secondaryColor,
         fontStyle: activeProfile.fontStyle,
         visualStyle: activeProfile.visualStyle,
+        targetGender: activeProfile.targetGender || "",
+        targetAgeRange: activeProfile.targetAgeRange || "",
+        targetAudienceDescription: activeProfile.targetAudienceDescription || "",
+        selectedAudienceProfileId: activeProfile.selectedAudienceProfileId || "",
+        audiencePromptInsert: activeProfile.audiencePromptInsert || "",
         additionalNotes: activeProfile.additionalNotes,
         targetAudience: activeProfile.targetAudience || "",
         logoDataUrl: activeProfile.logoDataUrl || "",
@@ -95,6 +108,11 @@ export default function Home() {
       secondaryColor: brandStyle.secondaryColors,
       fontStyle: brandStyle.fontStyle,
       visualStyle: brandStyle.visualStyle,
+      targetGender: brandStyle.targetGender,
+      targetAgeRange: brandStyle.targetAgeRange,
+      targetAudienceDescription: brandStyle.targetAudienceDescription,
+      selectedAudienceProfileId: brandStyle.selectedAudienceProfileId,
+      audiencePromptInsert: brandStyle.audiencePromptInsert,
       additionalNotes: brandStyle.additionalNotes,
       targetAudience: brandStyle.targetAudience,
       logoDataUrl: logoSettings.url || null,
@@ -108,7 +126,7 @@ export default function Home() {
 
     toast({
       title: "Profile saved",
-      description: `Brand profile "${profile.brandName}" has been saved.`,
+      description: `Brand profile "${profile.brandName}" has been saved (includes brand style and target audience).`,
     });
   };
 
@@ -122,6 +140,11 @@ export default function Home() {
         secondaryColors: profile.secondaryColor,
         fontStyle: profile.fontStyle,
         visualStyle: profile.visualStyle,
+        targetGender: profile.targetGender || "",
+        targetAgeRange: profile.targetAgeRange || "",
+        targetAudienceDescription: profile.targetAudienceDescription || "",
+        selectedAudienceProfileId: profile.selectedAudienceProfileId || "",
+        audiencePromptInsert: profile.audiencePromptInsert || "",
         additionalNotes: profile.additionalNotes,
         targetAudience: profile.targetAudience || "",
         logoDataUrl: profile.logoDataUrl || "",
@@ -256,7 +279,7 @@ export default function Home() {
             imageUrl = await overlayLogoOnImage({
               logoDataUrl: logoSettings.url,
               imageDataUrl: imageUrl,
-              logoSizePercent: logoSettings.size,
+              logoSizePercent: 25,
               paddingPercent: 3,
               position: logoSettings.position,
               opacity: logoSettings.opacity,
@@ -273,6 +296,18 @@ export default function Home() {
               : img
           )
         );
+        
+        const historyEntry: HistoryEntry = {
+          id: image.id,
+          prompt: image.prompt,
+          imageDataUrl: imageUrl,
+          mimeType: "image/png",
+          generatedAt: Date.now(),
+          brandName: brandStyle.brandName || undefined,
+        };
+        addToHistory(historyEntry);
+        setHistory(getHistory());
+        
         completed++;
       } catch (error) {
         setImages((prev) =>
@@ -397,6 +432,39 @@ export default function Home() {
     });
   };
 
+  const handleRemoveFromHistory = (id: string) => {
+    removeFromHistory(id);
+    setHistory(getHistory());
+    toast({
+      title: "Removed from history",
+      description: "Image has been removed from history.",
+    });
+  };
+
+  const handleClearHistory = () => {
+    clearHistory();
+    setHistory([]);
+    toast({
+      title: "History cleared",
+      description: "All history has been cleared.",
+    });
+  };
+
+  const handleDownloadFromHistory = (entry: HistoryEntry) => {
+    if (!entry.imageDataUrl) return;
+    
+    try {
+      const blob = base64ToBlob(entry.imageDataUrl);
+      saveAs(blob, `image-${entry.id}.png`);
+    } catch (error) {
+      toast({
+        title: "Download failed",
+        description: "Could not download the image.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const promptCount = parsePrompts().length;
   const totalGenerated = images.filter((img) => img.status === "completed").length;
 
@@ -443,10 +511,27 @@ export default function Home() {
               onDeleteProfile={handleDeleteProfile}
               onNewProfile={handleNewProfile}
             />
-
-            <AudienceSelector
-              selected={selectedAudience}
-              onSelect={setSelectedAudience}
+            <TargetAudience
+              data={{
+                targetGender: brandStyle.targetGender,
+                targetAgeRange: brandStyle.targetAgeRange,
+                targetAudienceDescription: brandStyle.targetAudienceDescription,
+                selectedAudienceProfileId: brandStyle.selectedAudienceProfileId,
+                audiencePromptInsert: brandStyle.audiencePromptInsert,
+              }}
+              onChange={(audienceData) => setBrandStyle(prev => ({
+                ...prev,
+                targetGender: audienceData.targetGender,
+                targetAgeRange: audienceData.targetAgeRange,
+                targetAudienceDescription: audienceData.targetAudienceDescription,
+                selectedAudienceProfileId: audienceData.selectedAudienceProfileId,
+                audiencePromptInsert: audienceData.audiencePromptInsert,
+              }))}
+              disabled={isGenerating}
+            />
+            <PromptInput
+              prompts={prompts}
+              onChange={setPrompts}
               disabled={isGenerating}
             />
 
@@ -456,121 +541,128 @@ export default function Home() {
               disabled={isGenerating}
             />
           </div>
-        </ScrollArea>
-
-        {/* Generate Button */}
-        <div className="p-4 border-t space-y-3">
-          {!isGenerating ? (
-            <Button
-              onClick={handleGenerate}
-              disabled={promptCount === 0}
-              className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg"
+          
+          <div>
+            <Tabs 
+              value={activeTab} 
+              onValueChange={(value) => setActiveTab(value as "generated" | "history")}
+              data-testid="tabs-gallery"
             >
-              <Sparkles className="w-5 h-5 mr-2" />
-              Generate {promptCount > 0 ? `${promptCount * genSettings.imagesPerPrompt} Images` : "Images"}
-            </Button>
-          ) : (
-            <Button
-              onClick={handleStop}
-              variant="destructive"
-              className="w-full h-12 text-lg font-semibold"
-            >
-              <Square className="w-4 h-4 mr-2" />
-              Stop Generation
-            </Button>
-          )}
-
-          {/* Stats */}
-          {totalGenerated > 0 && (
-            <div className="text-center text-sm text-muted-foreground">
-              <span className="font-bold text-primary">{totalGenerated}</span> images generated
-            </div>
-          )}
-        </div>
-
-        {/* Theme Toggle */}
-        <div className="p-3 border-t">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start"
-            onClick={toggleTheme}
-          >
-            {isDark ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
-            {isDark ? "Light Mode" : "Dark Mode"}
-          </Button>
-        </div>
-      </aside>
-
-      {/* Collapse Button (when sidebar is hidden) */}
-      {sidebarCollapsed && (
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setSidebarCollapsed(false)}
-          className="fixed top-4 left-4 z-50 shadow-lg"
-        >
-          <PanelLeft className="w-4 h-4" />
-        </Button>
-      )}
-
-      {/* Main Content */}
-      <main className="flex-1 min-h-screen">
-        {/* Top Bar */}
-        <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold">Create Images</h2>
-              <p className="text-sm text-muted-foreground">
-                Enter your prompts and generate AI images in bulk
-              </p>
-            </div>
-            {isGenerating && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Sparkles className="w-4 h-4 animate-pulse text-primary" />
-                <span>Generating...</span>
-              </div>
-            )}
-          </div>
-        </header>
-
-        {/* Content Area */}
-        <div className="p-6 space-y-6">
-          <div className="grid xl:grid-cols-2 gap-6">
-            {/* Left Column - Prompts & Settings */}
-            <div className="space-y-6">
-              <PromptInput
-                prompts={prompts}
-                onChange={setPrompts}
-                disabled={isGenerating}
-                brandStyle={brandStyle}
-              />
-
-              <GenerationSettings
-                settings={genSettings}
-                onChange={setGenSettings}
-                hasLogo={!!logoSettings.url}
-                hasAudience={!!selectedAudience}
-                disabled={isGenerating}
-              />
-
-              <GenerationProgress
-                status={generationStatus}
-                isVisible={isGenerating || generationStatus.total > 0}
-              />
-            </div>
-
-            {/* Right Column - Gallery */}
-            <div>
-              <ImageGallery
-                images={images}
-                onDownload={handleDownload}
-                onDownloadAll={handleDownloadAll}
-                onClearAll={handleClearAll}
-                onPreview={setPreviewImage}
-                isDownloading={isDownloading}
-              />
-            </div>
+              <TabsList className="mb-4" data-testid="tabs-list">
+                <TabsTrigger value="generated" data-testid="tab-generated">
+                  <Images className="w-4 h-4 mr-2" />
+                  Generated
+                </TabsTrigger>
+                <TabsTrigger value="history" data-testid="tab-history">
+                  <History className="w-4 h-4 mr-2" />
+                  History
+                  {history.length > 0 && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      ({history.length})
+                    </span>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="generated" data-testid="tab-content-generated">
+                <ImageGallery
+                  images={images}
+                  onDownload={handleDownload}
+                  onDownloadAll={handleDownloadAll}
+                  onClearAll={handleClearAll}
+                  onPreview={setPreviewImage}
+                  isDownloading={isDownloading}
+                />
+              </TabsContent>
+              
+              <TabsContent value="history" data-testid="tab-content-history">
+                <div className="h-full flex flex-col" data-testid="div-history">
+                  <div className="pb-4 flex items-center justify-between gap-4 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <History className="w-5 h-5 text-muted-foreground" />
+                      <h3 className="text-lg font-semibold">History</h3>
+                      {history.length > 0 && (
+                        <span className="text-sm font-normal text-muted-foreground">
+                          ({history.length} items)
+                        </span>
+                      )}
+                    </div>
+                    {history.length > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleClearHistory}
+                        data-testid="button-clear-history"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Clear All History
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    {history.length === 0 ? (
+                      <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground py-12" data-testid="history-empty-state">
+                        <History className="w-16 h-16 mb-4 opacity-20" />
+                        <p className="text-lg font-medium">No history yet</p>
+                        <p className="text-sm mt-1">Generated images will appear here</p>
+                      </div>
+                    ) : (
+                      <ScrollArea className="h-[calc(100vh-300px)]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                          {history.map((entry) => (
+                            <Card key={entry.id} className="overflow-hidden" data-testid={`card-history-${entry.id}`}>
+                              <div className="relative aspect-square">
+                                <img 
+                                  src={entry.imageDataUrl} 
+                                  alt={entry.prompt}
+                                  className="w-full h-full object-cover"
+                                  data-testid={`img-history-${entry.id}`}
+                                />
+                              </div>
+                              <div className="p-3 space-y-2">
+                                <p 
+                                  className="text-sm line-clamp-2" 
+                                  title={entry.prompt}
+                                  data-testid={`text-prompt-${entry.id}`}
+                                >
+                                  {entry.prompt}
+                                </p>
+                                <div className="flex items-center justify-between gap-2">
+                                  <span 
+                                    className="text-xs text-muted-foreground"
+                                    data-testid={`text-date-${entry.id}`}
+                                  >
+                                    {format(new Date(entry.generatedAt), "MMM d, yyyy h:mm a")}
+                                  </span>
+                                  <div className="flex items-center gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => handleDownloadFromHistory(entry)}
+                                      data-testid={`button-download-history-${entry.id}`}
+                                    >
+                                      <Download className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => handleRemoveFromHistory(entry.id)}
+                                      data-testid={`button-delete-history-${entry.id}`}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </main>
