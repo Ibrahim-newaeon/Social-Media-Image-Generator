@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus } from "lucide-react";
+import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus, MapPin, DollarSign } from "lucide-react";
 import { useState, useRef, type ChangeEvent } from "react";
 import type { BrandProfile } from "@/lib/brandProfilesStorage";
 
@@ -76,6 +76,14 @@ const VISUAL_STYLE_OPTIONS = [
   { value: "Parisian Chic - Soft blush & charcoal, vintage-inspired, café aesthetics, European sophistication", label: "Parisian Chic", description: "Soft blush & charcoal, vintage-inspired, café aesthetics, European sophistication" },
 ];
 
+const INCOME_LEVEL_OPTIONS = [
+  { value: "Budget-conscious", label: "Budget-conscious", description: "Value-focused, practical imagery" },
+  { value: "Mid-range", label: "Mid-range", description: "Quality-focused, balanced aesthetics" },
+  { value: "Upper mid-range", label: "Upper mid-range", description: "Premium quality, aspirational" },
+  { value: "Premium/Luxury", label: "Premium/Luxury", description: "High-end, exclusive aesthetics" },
+  { value: "All income levels", label: "All income levels", description: "Universal appeal" },
+];
+
 export function getDefaultBrandStyle(): BrandStyle {
   return { ...defaultBrandStyle };
 }
@@ -97,6 +105,12 @@ export function formatBrandStyleForPrompt(style: BrandStyle): string {
   }
   if (style.visualStyle) {
     parts.push(`Visual style: ${style.visualStyle}`);
+  }
+  if (style.targetLocation) {
+    parts.push(`Target market: ${style.targetLocation}`);
+  }
+  if (style.targetIncome && style.targetIncome !== "All income levels") {
+    parts.push(`Target income level: ${style.targetIncome}`);
   }
   if (style.targetGender || style.targetAgeRange || style.targetAudienceDescription) {
     const audienceParts: string[] = [];
@@ -461,6 +475,50 @@ export default function BrandGuidelines({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Location & Income Level */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="targetLocation" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Target Market / Location
+                </Label>
+                <Input
+                  id="targetLocation"
+                  placeholder="e.g., USA, GCC, Europe, Global"
+                  value={brandStyle.targetLocation}
+                  onChange={(e) => handleChange("targetLocation", e.target.value)}
+                  disabled={disabled}
+                  data-testid="input-target-location"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="targetIncome" className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Target Income Level
+                </Label>
+                <Select
+                  value={brandStyle.targetIncome}
+                  onValueChange={(value) => handleChange("targetIncome", value)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger data-testid="select-income-level">
+                    <SelectValue placeholder="Select income level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INCOME_LEVEL_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{option.label}</span>
+                          <span className="text-xs text-muted-foreground">{option.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="space-y-2">
