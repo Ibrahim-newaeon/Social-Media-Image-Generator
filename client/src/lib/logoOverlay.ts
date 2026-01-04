@@ -1,8 +1,12 @@
+export type LogoPosition = "bottom-right" | "bottom-left" | "top-right" | "top-left";
+
 export interface LogoOverlayOptions {
   logoDataUrl: string;
   imageDataUrl: string;
   logoSizePercent?: number;
   paddingPercent?: number;
+  position?: LogoPosition;
+  opacity?: number;
 }
 
 export async function overlayLogoOnImage(options: LogoOverlayOptions): Promise<string> {
@@ -11,6 +15,8 @@ export async function overlayLogoOnImage(options: LogoOverlayOptions): Promise<s
     imageDataUrl,
     logoSizePercent = 25,
     paddingPercent = 3,
+    position = "bottom-right",
+    opacity = 100,
   } = options;
 
   return new Promise((resolve, reject) => {
@@ -40,11 +46,35 @@ export async function overlayLogoOnImage(options: LogoOverlayOptions): Promise<s
         const logoHeight = logoWidth / logoAspectRatio;
         
         const padding = (canvas.width * paddingPercent) / 100;
-        const x = canvas.width - logoWidth - padding;
-        const y = canvas.height - logoHeight - padding;
-        
-        // Draw logo as-is (logo should have its own transparency)
+
+        // Calculate position based on selected corner
+        let x: number;
+        let y: number;
+
+        switch (position) {
+          case "top-left":
+            x = padding;
+            y = padding;
+            break;
+          case "top-right":
+            x = canvas.width - logoWidth - padding;
+            y = padding;
+            break;
+          case "bottom-left":
+            x = padding;
+            y = canvas.height - logoHeight - padding;
+            break;
+          case "bottom-right":
+          default:
+            x = canvas.width - logoWidth - padding;
+            y = canvas.height - logoHeight - padding;
+            break;
+        }
+
+        // Apply opacity and draw logo
+        ctx.globalAlpha = opacity / 100;
         ctx.drawImage(logoImage, x, y, logoWidth, logoHeight);
+        ctx.globalAlpha = 1;
         
         const resultDataUrl = canvas.toDataURL("image/png");
         resolve(resultDataUrl);

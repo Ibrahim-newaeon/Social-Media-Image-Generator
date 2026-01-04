@@ -10,6 +10,7 @@ export interface BrandProfile {
   selectedAudienceProfileId: string;
   audiencePromptInsert: string;
   additionalNotes: string;
+  targetAudience: string;
   logoDataUrl: string | null;
   lastModified: number;
 }

@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import Header from "@/components/Header";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import PromptInput from "@/components/PromptInput";
-import GenerateControls from "@/components/GenerateControls";
 import GenerationProgress, { GenerationStatus } from "@/components/GenerationProgress";
 import ImageGallery from "@/components/ImageGallery";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
@@ -10,13 +10,14 @@ import TargetAudience from "@/components/TargetAudience";
 import { GeneratedImage } from "@/components/ImageCard";
 import { useToast } from "@/hooks/use-toast";
 import { overlayLogoOnImage } from "@/lib/logoOverlay";
-import { 
-  getAllProfiles, 
-  saveProfile, 
-  deleteProfile, 
-  loadActiveProfile, 
+import { type AudienceProfile } from "@/data/audiences";
+import {
+  getAllProfiles,
+  saveProfile,
+  deleteProfile,
+  loadActiveProfile,
   setActiveProfileName,
-  type BrandProfile 
+  type BrandProfile
 } from "@/lib/brandProfilesStorage";
 import { 
   getHistory, 
@@ -33,8 +34,18 @@ import { Download, Trash2, History, Images } from "lucide-react";
 import { format } from "date-fns";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import {
+  ImagePlus,
+  Sparkles,
+  Square,
+  Moon,
+  Sun,
+  PanelLeftClose,
+  PanelLeft,
+} from "lucide-react";
 
 export default function Home() {
+  // State
   const [prompts, setPrompts] = useState("");
   const [images, setImages] = useState<GeneratedImage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -53,6 +64,7 @@ export default function Home() {
   const shouldStopRef = useRef(false);
   const { toast } = useToast();
 
+  // Load saved profile on mount
   useEffect(() => {
     setSavedProfiles(getAllProfiles());
     setHistory(getHistory());
@@ -70,15 +82,26 @@ export default function Home() {
         selectedAudienceProfileId: activeProfile.selectedAudienceProfileId || "",
         audiencePromptInsert: activeProfile.audiencePromptInsert || "",
         additionalNotes: activeProfile.additionalNotes,
+        targetAudience: activeProfile.targetAudience || "",
         logoDataUrl: activeProfile.logoDataUrl || "",
       });
+      if (activeProfile.logoDataUrl) {
+        setLogoSettings(prev => ({ ...prev, url: activeProfile.logoDataUrl || "" }));
+      }
     }
   }, []);
 
+  // Theme toggle
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+    document.documentElement.classList.toggle("dark");
+  };
+
+  // Profile handlers
   const handleSaveProfile = () => {
     const trimmedName = brandStyle.brandName.trim();
     if (!trimmedName) return;
-    
+
     const profile: BrandProfile = {
       brandName: trimmedName,
       primaryColor: brandStyle.primaryColors,
@@ -91,15 +114,16 @@ export default function Home() {
       selectedAudienceProfileId: brandStyle.selectedAudienceProfileId,
       audiencePromptInsert: brandStyle.audiencePromptInsert,
       additionalNotes: brandStyle.additionalNotes,
-      logoDataUrl: brandStyle.logoDataUrl || null,
+      targetAudience: brandStyle.targetAudience,
+      logoDataUrl: logoSettings.url || null,
       lastModified: Date.now(),
     };
-    
+
     setBrandStyle(prev => ({ ...prev, brandName: trimmedName }));
     saveProfile(profile);
     setActiveProfileName(profile.brandName);
     setSavedProfiles(getAllProfiles());
-    
+
     toast({
       title: "Profile saved",
       description: `Brand profile "${profile.brandName}" has been saved (includes brand style and target audience).`,
@@ -122,8 +146,12 @@ export default function Home() {
         selectedAudienceProfileId: profile.selectedAudienceProfileId || "",
         audiencePromptInsert: profile.audiencePromptInsert || "",
         additionalNotes: profile.additionalNotes,
+        targetAudience: profile.targetAudience || "",
         logoDataUrl: profile.logoDataUrl || "",
       });
+      if (profile.logoDataUrl) {
+        setLogoSettings(prev => ({ ...prev, url: profile.logoDataUrl || "" }));
+      }
       setActiveProfileName(profile.brandName);
     }
   };
@@ -132,7 +160,8 @@ export default function Home() {
     deleteProfile(brandName);
     setSavedProfiles(getAllProfiles());
     setBrandStyle(getDefaultBrandStyle());
-    
+    setLogoSettings(getDefaultLogoSettings());
+
     toast({
       title: "Profile deleted",
       description: `Brand profile "${brandName}" has been deleted.`,
@@ -141,8 +170,10 @@ export default function Home() {
 
   const handleNewProfile = () => {
     setBrandStyle(getDefaultBrandStyle());
+    setLogoSettings(getDefaultLogoSettings());
   };
 
+  // Prompt parsing
   const parsePrompts = useCallback((): string[] => {
     return prompts
       .split("\n")
@@ -150,6 +181,27 @@ export default function Home() {
       .filter((line) => line.length > 0);
   }, [prompts]);
 
+  // Build enhanced prompt with brand + audience
+  const buildEnhancedPrompt = (basePrompt: string): string => {
+    let enhancedPrompt = basePrompt;
+
+    // Add brand context
+    if (genSettings.applyBrandColors) {
+      const brandPrefix = formatBrandStyleForPrompt(brandStyle);
+      if (brandPrefix) {
+        enhancedPrompt = brandPrefix + enhancedPrompt;
+      }
+    }
+
+    // Add audience requirements
+    if (genSettings.applyAudienceRules && selectedAudience) {
+      enhancedPrompt += `\n\n${selectedAudience.promptAddition}`;
+    }
+
+    return enhancedPrompt;
+  };
+
+  // Generation handler
   const handleGenerate = async () => {
     const promptList = parsePrompts();
     if (promptList.length === 0) {
@@ -163,17 +215,24 @@ export default function Home() {
 
     setIsGenerating(true);
     shouldStopRef.current = false;
-    
-    const initialImages: GeneratedImage[] = promptList.map((prompt, index) => ({
-      id: `img-${Date.now()}-${index}`,
-      prompt,
-      status: "pending",
-    }));
-    
+
+    const totalImages = promptList.length * genSettings.imagesPerPrompt;
+    const initialImages: GeneratedImage[] = [];
+
+    for (let i = 0; i < promptList.length; i++) {
+      for (let j = 0; j < genSettings.imagesPerPrompt; j++) {
+        initialImages.push({
+          id: `img-${Date.now()}-${i}-${j}`,
+          prompt: promptList[i],
+          status: "pending",
+        });
+      }
+    }
+
     setImages(initialImages);
     setGenerationStatus({
       current: 0,
-      total: promptList.length,
+      total: totalImages,
       completed: 0,
       failed: 0,
     });
@@ -185,13 +244,13 @@ export default function Home() {
       if (shouldStopRef.current) break;
 
       const image = initialImages[i];
-      
+
       setImages((prev) =>
         prev.map((img) =>
           img.id === image.id ? { ...img, status: "generating" } : img
         )
       );
-      
+
       setGenerationStatus((prev) => ({
         ...prev,
         current: i + 1,
@@ -199,13 +258,12 @@ export default function Home() {
       }));
 
       try {
-        const brandPrefix = formatBrandStyleForPrompt(brandStyle);
-        const fullPrompt = brandPrefix + image.prompt;
-        
+        const enhancedPrompt = buildEnhancedPrompt(image.prompt);
+
         const response = await fetch("/api/generate-image", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: fullPrompt }),
+          body: JSON.stringify({ prompt: enhancedPrompt }),
         });
 
         if (!response.ok) {
@@ -214,20 +272,23 @@ export default function Home() {
 
         const data = await response.json();
         let imageUrl = `data:${data.mimeType};base64,${data.b64_json}`;
-        
-        if (brandStyle.logoDataUrl) {
+
+        // Apply logo watermark if enabled
+        if (genSettings.applyLogoWatermark && logoSettings.url) {
           try {
             imageUrl = await overlayLogoOnImage({
-              logoDataUrl: brandStyle.logoDataUrl,
+              logoDataUrl: logoSettings.url,
               imageDataUrl: imageUrl,
               logoSizePercent: 25,
               paddingPercent: 3,
+              position: logoSettings.position,
+              opacity: logoSettings.opacity,
             });
           } catch (overlayError) {
             console.error("Logo overlay failed:", overlayError);
           }
         }
-        
+
         setImages((prev) =>
           prev.map((img) =>
             img.id === image.id
@@ -284,10 +345,11 @@ export default function Home() {
     });
   };
 
+  // Download handlers
   const base64ToBlob = (dataUrl: string): Blob => {
-    const [header, base64Data] = dataUrl.split(',');
+    const [header, base64Data] = dataUrl.split(",");
     const mimeMatch = header.match(/data:([^;]+);/);
-    const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+    const mimeType = mimeMatch ? mimeMatch[1] : "image/png";
     const binaryString = atob(base64Data);
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
@@ -298,7 +360,7 @@ export default function Home() {
 
   const handleDownload = (image: GeneratedImage) => {
     if (!image.imageUrl) return;
-    
+
     try {
       const blob = base64ToBlob(image.imageUrl);
       saveAs(blob, `image-${image.id}.png`);
@@ -344,7 +406,7 @@ export default function Home() {
 
       const content = await zip.generateAsync({ type: "blob" });
       saveAs(content, `generated-images-${Date.now()}.zip`);
-      
+
       toast({
         title: "Download complete",
         description: `Downloaded ${completedImages.length} images as ZIP.`,
@@ -407,12 +469,38 @@ export default function Home() {
   const totalGenerated = images.filter((img) => img.status === "completed").length;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header totalGenerated={totalGenerated} isGenerating={isGenerating} />
-      
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
-          <div className="space-y-6">
+    <div className="min-h-screen bg-background flex">
+      {/* Left Sidebar */}
+      <aside
+        className={`
+          flex flex-col bg-card border-r h-screen sticky top-0 transition-all duration-300
+          ${sidebarCollapsed ? "w-0 overflow-hidden" : "w-[320px]"}
+        `}
+      >
+        {/* Sidebar Header */}
+        <div className="p-4 border-b flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg">
+              <ImagePlus className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-lg">AI Studio</h1>
+              <p className="text-xs text-muted-foreground">Bulk Image Generator</p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarCollapsed(true)}
+            className="h-8 w-8"
+          >
+            <PanelLeftClose className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Sidebar Content */}
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-4">
             <BrandGuidelines
               brandStyle={brandStyle}
               onChange={setBrandStyle}
@@ -446,15 +534,11 @@ export default function Home() {
               onChange={setPrompts}
               disabled={isGenerating}
             />
-            <GenerateControls
-              onGenerate={handleGenerate}
-              onStop={handleStop}
-              isGenerating={isGenerating}
-              promptCount={promptCount}
-            />
-            <GenerationProgress
-              status={generationStatus}
-              isVisible={isGenerating || generationStatus.total > 0}
+
+            <LogoUploader
+              settings={logoSettings}
+              onChange={setLogoSettings}
+              disabled={isGenerating}
             />
           </div>
           
@@ -582,13 +666,17 @@ export default function Home() {
           </div>
         </div>
       </main>
-      
+
+      {/* Image Preview Modal */}
       <ImagePreviewModal
         image={previewImage}
         isOpen={!!previewImage}
         onClose={() => setPreviewImage(null)}
         onDownload={handleDownload}
       />
+
+      {/* AI Chat Assistant */}
+      <ChatAssistant />
     </div>
   );
 }
