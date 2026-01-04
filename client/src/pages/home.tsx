@@ -29,22 +29,12 @@ import {
   clearHistory,
   type HistoryEntry
 } from "@/lib/imageHistoryStorage";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
+import { Download, Trash2, History, Images, ImagePlus, Sparkles, Square, Moon, Sun, PanelLeftClose, PanelLeft } from "lucide-react";
+import { format } from "date-fns";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import { format } from "date-fns";
-import {
-  ImagePlus,
-  Sparkles,
-  Square,
-  Moon,
-  Sun,
-  PanelLeftClose,
-  PanelLeft,
-  Download,
-  Trash2,
-  History,
-  Images,
-} from "lucide-react";
 
 export default function Home() {
   // State
@@ -60,6 +50,16 @@ export default function Home() {
   const [isDark, setIsDark] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [activeTab, setActiveTab] = useState<"generated" | "history">("generated");
+  const [logoSettings, setLogoSettings] = useState<LogoSettings>(getDefaultLogoSettings());
+  const [isDark, setIsDark] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [genSettings, setGenSettings] = useState({
+    applyBrandColors: true,
+    applyAudienceRules: true,
+    applyLogoWatermark: true,
+    imagesPerPrompt: 1,
+  });
+  const [selectedAudience, setSelectedAudience] = useState<AudienceProfile | null>(null);
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus>({
     current: 0,
     total: 0,
@@ -740,8 +740,8 @@ export default function Home() {
               </Tabs>
             </div>
           </div>
-        </div>
-      </main>
+        </ScrollArea>
+      </aside>
 
       {/* Image Preview Modal */}
       <ImagePreviewModal
