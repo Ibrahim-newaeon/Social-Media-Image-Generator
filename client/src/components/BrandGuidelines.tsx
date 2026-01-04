@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus, Users } from "lucide-react";
+import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus } from "lucide-react";
 import { useState, useRef, type ChangeEvent } from "react";
 import type { BrandProfile } from "@/lib/brandProfilesStorage";
 
@@ -44,21 +44,6 @@ const defaultBrandStyle: BrandStyle = {
   additionalNotes: "",
   logoDataUrl: "",
 };
-
-const GENDER_OPTIONS = [
-  { value: "Male", label: "Male" },
-  { value: "Female", label: "Female" },
-  { value: "All Genders", label: "All Genders" },
-];
-
-const AGE_RANGE_OPTIONS = [
-  { value: "18-24", label: "18-24" },
-  { value: "25-34", label: "25-34" },
-  { value: "35-44", label: "35-44" },
-  { value: "45-54", label: "45-54" },
-  { value: "55+", label: "55+" },
-  { value: "All Ages", label: "All Ages" },
-];
 
 const TYPOGRAPHY_OPTIONS = [
   { value: "Cormorant Garamond - Ultra-elegant, high contrast, fashion-forward", label: "Cormorant Garamond", description: "Ultra-elegant, high contrast, fashion-forward" },
@@ -458,66 +443,6 @@ export default function BrandGuidelines({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="space-y-3 p-4 border rounded-md bg-muted/20">
-              <Label className="flex items-center gap-2 text-base font-medium">
-                <Users className="h-4 w-4" />
-                Target Audience
-              </Label>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="targetGender" className="text-sm">Gender</Label>
-                  <Select
-                    value={brandStyle.targetGender}
-                    onValueChange={(value) => handleChange("targetGender", value)}
-                    disabled={disabled}
-                  >
-                    <SelectTrigger data-testid="select-target-gender">
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {GENDER_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="targetAgeRange" className="text-sm">Age Range</Label>
-                  <Select
-                    value={brandStyle.targetAgeRange}
-                    onValueChange={(value) => handleChange("targetAgeRange", value)}
-                    disabled={disabled}
-                  >
-                    <SelectTrigger data-testid="select-target-age">
-                      <SelectValue placeholder="Select age range" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {AGE_RANGE_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="targetAudienceDescription" className="text-sm">Description</Label>
-                <Textarea
-                  id="targetAudienceDescription"
-                  placeholder="e.g., Health-conscious professionals interested in organic skincare"
-                  value={brandStyle.targetAudienceDescription}
-                  onChange={(e) => handleChange("targetAudienceDescription", e.target.value)}
-                  disabled={disabled}
-                  className="resize-none"
-                  rows={2}
-                  data-testid="input-target-audience-description"
-                />
-              </div>
             </div>
 
             <div className="space-y-2">

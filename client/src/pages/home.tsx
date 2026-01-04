@@ -6,6 +6,7 @@ import GenerationProgress, { GenerationStatus } from "@/components/GenerationPro
 import ImageGallery from "@/components/ImageGallery";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
 import BrandGuidelines, { BrandStyle, getDefaultBrandStyle, formatBrandStyleForPrompt } from "@/components/BrandGuidelines";
+import TargetAudience from "@/components/TargetAudience";
 import { GeneratedImage } from "@/components/ImageCard";
 import { useToast } from "@/hooks/use-toast";
 import { overlayLogoOnImage } from "@/lib/logoOverlay";
@@ -415,6 +416,20 @@ export default function Home() {
               onLoadProfile={handleLoadProfile}
               onDeleteProfile={handleDeleteProfile}
               onNewProfile={handleNewProfile}
+            />
+            <TargetAudience
+              data={{
+                targetGender: brandStyle.targetGender,
+                targetAgeRange: brandStyle.targetAgeRange,
+                targetAudienceDescription: brandStyle.targetAudienceDescription,
+              }}
+              onChange={(audienceData) => setBrandStyle(prev => ({
+                ...prev,
+                targetGender: audienceData.targetGender,
+                targetAgeRange: audienceData.targetAgeRange,
+                targetAudienceDescription: audienceData.targetAudienceDescription,
+              }))}
+              disabled={isGenerating}
             />
             <PromptInput
               prompts={prompts}
