@@ -24,6 +24,12 @@ import {
   clearHistory,
   type HistoryEntry 
 } from "@/lib/imageHistoryStorage";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Download, Trash2, History, Images } from "lucide-react";
+import { format } from "date-fns";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -348,6 +354,39 @@ export default function Home() {
     });
   };
 
+  const handleRemoveFromHistory = (id: string) => {
+    removeFromHistory(id);
+    setHistory(getHistory());
+    toast({
+      title: "Removed from history",
+      description: "Image has been removed from history.",
+    });
+  };
+
+  const handleClearHistory = () => {
+    clearHistory();
+    setHistory([]);
+    toast({
+      title: "History cleared",
+      description: "All history has been cleared.",
+    });
+  };
+
+  const handleDownloadFromHistory = (entry: HistoryEntry) => {
+    if (!entry.imageDataUrl) return;
+    
+    try {
+      const blob = base64ToBlob(entry.imageDataUrl);
+      saveAs(blob, `image-${entry.id}.png`);
+    } catch (error) {
+      toast({
+        title: "Download failed",
+        description: "Could not download the image.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const promptCount = parsePrompts().length;
   const totalGenerated = images.filter((img) => img.status === "completed").length;
 
@@ -386,14 +425,126 @@ export default function Home() {
           </div>
           
           <div>
-            <ImageGallery
-              images={images}
-              onDownload={handleDownload}
-              onDownloadAll={handleDownloadAll}
-              onClearAll={handleClearAll}
-              onPreview={setPreviewImage}
-              isDownloading={isDownloading}
-            />
+            <Tabs 
+              value={activeTab} 
+              onValueChange={(value) => setActiveTab(value as "generated" | "history")}
+              data-testid="tabs-gallery"
+            >
+              <TabsList className="mb-4" data-testid="tabs-list">
+                <TabsTrigger value="generated" data-testid="tab-generated">
+                  <Images className="w-4 h-4 mr-2" />
+                  Generated
+                </TabsTrigger>
+                <TabsTrigger value="history" data-testid="tab-history">
+                  <History className="w-4 h-4 mr-2" />
+                  History
+                  {history.length > 0 && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      ({history.length})
+                    </span>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="generated" data-testid="tab-content-generated">
+                <ImageGallery
+                  images={images}
+                  onDownload={handleDownload}
+                  onDownloadAll={handleDownloadAll}
+                  onClearAll={handleClearAll}
+                  onPreview={setPreviewImage}
+                  isDownloading={isDownloading}
+                />
+              </TabsContent>
+              
+              <TabsContent value="history" data-testid="tab-content-history">
+                <div className="h-full flex flex-col" data-testid="div-history">
+                  <div className="pb-4 flex items-center justify-between gap-4 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <History className="w-5 h-5 text-muted-foreground" />
+                      <h3 className="text-lg font-semibold">History</h3>
+                      {history.length > 0 && (
+                        <span className="text-sm font-normal text-muted-foreground">
+                          ({history.length} items)
+                        </span>
+                      )}
+                    </div>
+                    {history.length > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleClearHistory}
+                        data-testid="button-clear-history"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Clear All History
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    {history.length === 0 ? (
+                      <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground py-12" data-testid="history-empty-state">
+                        <History className="w-16 h-16 mb-4 opacity-20" />
+                        <p className="text-lg font-medium">No history yet</p>
+                        <p className="text-sm mt-1">Generated images will appear here</p>
+                      </div>
+                    ) : (
+                      <ScrollArea className="h-[calc(100vh-300px)]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                          {history.map((entry) => (
+                            <Card key={entry.id} className="overflow-hidden" data-testid={`card-history-${entry.id}`}>
+                              <div className="relative aspect-square">
+                                <img 
+                                  src={entry.imageDataUrl} 
+                                  alt={entry.prompt}
+                                  className="w-full h-full object-cover"
+                                  data-testid={`img-history-${entry.id}`}
+                                />
+                              </div>
+                              <div className="p-3 space-y-2">
+                                <p 
+                                  className="text-sm line-clamp-2" 
+                                  title={entry.prompt}
+                                  data-testid={`text-prompt-${entry.id}`}
+                                >
+                                  {entry.prompt}
+                                </p>
+                                <div className="flex items-center justify-between gap-2">
+                                  <span 
+                                    className="text-xs text-muted-foreground"
+                                    data-testid={`text-date-${entry.id}`}
+                                  >
+                                    {format(new Date(entry.generatedAt), "MMM d, yyyy h:mm a")}
+                                  </span>
+                                  <div className="flex items-center gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => handleDownloadFromHistory(entry)}
+                                      data-testid={`button-download-history-${entry.id}`}
+                                    >
+                                      <Download className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => handleRemoveFromHistory(entry.id)}
+                                      data-testid={`button-delete-history-${entry.id}`}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </main>
