@@ -12,7 +12,126 @@ interface BrandStyleInput {
   targetAudience?: string;
 }
 
+interface AnalysisOptions {
+  analyzeColors: boolean;
+  analyzeStyle: boolean;
+  analyzeComposition: boolean;
+  analyzeMood: boolean;
+}
+
 export function registerImageRoutes(app: Express): void {
+  // Analyze reference images for style extraction
+  app.post("/api/analyze-reference", async (req: Request, res: Response) => {
+    try {
+      const { images, options } = req.body as {
+        images: string[]; // Array of base64 data URLs
+        options: AnalysisOptions;
+      };
+
+      if (!images || images.length === 0) {
+        return res.status(400).json({ error: "At least one image is required" });
+      }
+
+      // Build the analysis prompt based on options
+      const analysisRequests: string[] = [];
+      if (options.analyzeColors) {
+        analysisRequests.push("- Extract the dominant color palette (list 4-6 hex color codes)");
+      }
+      if (options.analyzeStyle) {
+        analysisRequests.push("- Describe the visual style (e.g., minimalist, luxury, rustic, modern, vintage, etc.) in 1-2 sentences");
+      }
+      if (options.analyzeComposition) {
+        analysisRequests.push("- Describe the composition and layout approach (e.g., centered, rule of thirds, negative space usage) in 1-2 sentences");
+      }
+      if (options.analyzeMood) {
+        analysisRequests.push("- Describe the mood and atmosphere (e.g., warm, professional, playful, elegant) in 1-2 sentences");
+      }
+
+      const prompt = `Analyze the following reference image(s) for use in generating similar styled images.
+
+Please extract the following attributes:
+${analysisRequests.join("\n")}
+
+Also provide a brief overall summary (1-2 sentences) that captures the essential visual identity.
+
+IMPORTANT: Return your response in this exact JSON format:
+{
+  "colors": ["#hex1", "#hex2", ...],
+  "style": "description of visual style",
+  "composition": "description of composition",
+  "mood": "description of mood",
+  "summary": "brief overall summary"
+}
+
+Only include fields that were requested. Return valid JSON only, no additional text.`;
+
+      // Prepare image parts for the API
+      const imageParts = images.map((dataUrl: string) => {
+        // Extract base64 data from data URL
+        const matches = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+        if (!matches) {
+          throw new Error("Invalid image data URL format");
+        }
+        return {
+          inlineData: {
+            mimeType: matches[1],
+            data: matches[2],
+          },
+        };
+      });
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash-preview-05-20",
+        contents: [
+          {
+            role: "user",
+            parts: [
+              ...imageParts,
+              { text: prompt },
+            ],
+          },
+        ],
+      });
+
+      const textPart = response.candidates?.[0]?.content?.parts?.[0];
+      if (!textPart || typeof (textPart as any).text !== "string") {
+        return res.status(500).json({ error: "Failed to analyze images" });
+      }
+
+      // Parse the JSON response
+      let analysisText = (textPart as any).text.trim();
+
+      // Remove markdown code blocks if present
+      if (analysisText.startsWith("```json")) {
+        analysisText = analysisText.slice(7);
+      }
+      if (analysisText.startsWith("```")) {
+        analysisText = analysisText.slice(3);
+      }
+      if (analysisText.endsWith("```")) {
+        analysisText = analysisText.slice(0, -3);
+      }
+      analysisText = analysisText.trim();
+
+      try {
+        const analysis = JSON.parse(analysisText);
+        res.json({
+          colors: analysis.colors || [],
+          style: analysis.style || "",
+          composition: analysis.composition || "",
+          mood: analysis.mood || "",
+          summary: analysis.summary || "Style extracted from reference images",
+        });
+      } catch (parseError) {
+        console.error("Failed to parse analysis response:", analysisText);
+        res.status(500).json({ error: "Failed to parse analysis response" });
+      }
+    } catch (error) {
+      console.error("Error analyzing reference images:", error);
+      res.status(500).json({ error: "Failed to analyze reference images" });
+    }
+  });
+
   // Generate AI-powered prompt suggestions based on brand guidelines
   app.post("/api/suggest-prompts", async (req: Request, res: Response) => {
     try {

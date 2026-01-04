@@ -10,6 +10,7 @@ import ImagePreviewModal from "@/components/ImagePreviewModal";
 import BrandGuidelines, { BrandStyle, getDefaultBrandStyle, formatBrandStyleForPrompt } from "@/components/BrandGuidelines";
 import TargetAudience from "@/components/TargetAudience";
 import LogoUploader, { LogoSettings, getDefaultLogoSettings } from "@/components/LogoUploader";
+import ReferenceImages, { ReferenceSettings, buildReferencePromptInsert } from "@/components/ReferenceImages";
 import ChatAssistant from "@/components/ChatAssistant";
 import { GeneratedImage } from "@/components/ImageCard";
 import { useToast } from "@/hooks/use-toast";
@@ -56,6 +57,16 @@ export default function Home() {
   const [brandStyle, setBrandStyle] = useState<BrandStyle>(getDefaultBrandStyle());
   const [savedProfiles, setSavedProfiles] = useState<BrandProfile[]>([]);
   const [logoSettings, setLogoSettings] = useState<LogoSettings>(getDefaultLogoSettings());
+  const [referenceSettings, setReferenceSettings] = useState<ReferenceSettings>({
+    images: [],
+    analyzeColors: true,
+    analyzeStyle: true,
+    analyzeComposition: false,
+    analyzeMood: true,
+    analysis: null,
+    isAnalyzed: false,
+  });
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -190,6 +201,52 @@ export default function Home() {
     setLogoSettings(getDefaultLogoSettings());
   };
 
+  // Reference image analysis handler
+  const handleAnalyzeReference = async () => {
+    if (referenceSettings.images.length === 0) return;
+
+    setIsAnalyzing(true);
+    try {
+      const response = await fetch("/api/analyze-reference", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          images: referenceSettings.images.map((img) => img.dataUrl),
+          options: {
+            analyzeColors: referenceSettings.analyzeColors,
+            analyzeStyle: referenceSettings.analyzeStyle,
+            analyzeComposition: referenceSettings.analyzeComposition,
+            analyzeMood: referenceSettings.analyzeMood,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Analysis failed");
+      }
+
+      const analysis = await response.json();
+      setReferenceSettings((prev) => ({
+        ...prev,
+        analysis,
+        isAnalyzed: true,
+      }));
+
+      toast({
+        title: "Analysis complete",
+        description: "Reference style has been extracted and will apply to all generated images.",
+      });
+    } catch (error) {
+      toast({
+        title: "Analysis failed",
+        description: "Could not analyze reference images. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   // Prompt parsing
   const parsePrompts = useCallback((): string[] => {
     return prompts
@@ -198,7 +255,7 @@ export default function Home() {
       .filter((line) => line.length > 0);
   }, [prompts]);
 
-  // Build enhanced prompt with brand
+  // Build enhanced prompt with brand and reference style
   const buildEnhancedPrompt = (basePrompt: string): string => {
     let enhancedPrompt = basePrompt;
     const brandPrefix = formatBrandStyleForPrompt(brandStyle);
@@ -207,6 +264,11 @@ export default function Home() {
     }
     if (brandStyle.audiencePromptInsert) {
       enhancedPrompt += `\n\n${brandStyle.audiencePromptInsert}`;
+    }
+    // Add reference style insert if analyzed (applies to all prompts)
+    const referenceInsert = buildReferencePromptInsert(referenceSettings);
+    if (referenceInsert) {
+      enhancedPrompt += `\n\n${referenceInsert}`;
     }
     return enhancedPrompt;
   };
@@ -489,6 +551,13 @@ export default function Home() {
               disabled={isGenerating}
             />
             <LogoUploader settings={logoSettings} onChange={setLogoSettings} disabled={isGenerating} />
+            <ReferenceImages
+              data={referenceSettings}
+              onChange={setReferenceSettings}
+              onAnalyze={handleAnalyzeReference}
+              isAnalyzing={isAnalyzing}
+              disabled={isGenerating}
+            />
           </div>
         </ScrollArea>
 
