@@ -3,8 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus, Users } from "lucide-react";
+import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus, MapPin, DollarSign } from "lucide-react";
 import { useState, useRef, type ChangeEvent } from "react";
 import type { BrandProfile } from "@/lib/brandProfilesStorage";
 
@@ -22,6 +21,11 @@ export interface BrandStyle {
   additionalNotes: string;
   targetAudience: string;
   logoDataUrl: string;
+  // New generic audience fields
+  targetLocation: string;
+  targetIncome: string;
+  targetInterests: string;
+  targetLanguage: string;
 }
 
 interface BrandGuidelinesProps {
@@ -49,6 +53,10 @@ const defaultBrandStyle: BrandStyle = {
   additionalNotes: "",
   targetAudience: "",
   logoDataUrl: "",
+  targetLocation: "",
+  targetIncome: "",
+  targetInterests: "",
+  targetLanguage: "",
 };
 
 const TYPOGRAPHY_OPTIONS = [
@@ -65,6 +73,14 @@ const VISUAL_STYLE_OPTIONS = [
   { value: "Modern Classic - Timeless black & white, structured grids, sophisticated contrast, editorial balance", label: "Modern Classic", description: "Timeless black & white, structured grids, sophisticated contrast, editorial balance" },
   { value: "Botanical Elegance - Delicate florals, sage greens, cream tones, nature-inspired organic elements", label: "Botanical Elegance", description: "Delicate florals, sage greens, cream tones, nature-inspired organic elements" },
   { value: "Parisian Chic - Soft blush & charcoal, vintage-inspired, café aesthetics, European sophistication", label: "Parisian Chic", description: "Soft blush & charcoal, vintage-inspired, café aesthetics, European sophistication" },
+];
+
+const INCOME_LEVEL_OPTIONS = [
+  { value: "Budget-conscious", label: "Budget-conscious", description: "Value-focused, practical imagery" },
+  { value: "Mid-range", label: "Mid-range", description: "Quality-focused, balanced aesthetics" },
+  { value: "Upper mid-range", label: "Upper mid-range", description: "Premium quality, aspirational" },
+  { value: "Premium/Luxury", label: "Premium/Luxury", description: "High-end, exclusive aesthetics" },
+  { value: "All income levels", label: "All income levels", description: "Universal appeal" },
 ];
 
 export function getDefaultBrandStyle(): BrandStyle {
@@ -88,6 +104,12 @@ export function formatBrandStyleForPrompt(style: BrandStyle): string {
   }
   if (style.visualStyle) {
     parts.push(`Visual style: ${style.visualStyle}`);
+  }
+  if (style.targetLocation) {
+    parts.push(`Target market: ${style.targetLocation}`);
+  }
+  if (style.targetIncome && style.targetIncome !== "All income levels") {
+    parts.push(`Target income level: ${style.targetIncome}`);
   }
   if (style.targetGender || style.targetAgeRange || style.targetAudienceDescription) {
     const audienceParts: string[] = [];
@@ -167,99 +189,83 @@ export default function BrandGuidelines({
   const hasContent = Object.values(brandStyle).some((v) => v.length > 0);
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Palette className="h-5 w-5 text-muted-foreground" />
-            Brand Style Guidelines
+    <Card className="border-border/50 bg-card/50">
+      <CardHeader className="pb-2 px-4 pt-4">
+        {/* Header Row */}
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <Palette className="h-4 w-4 text-primary" />
+            <span className="text-primary">Brand Style Guidelines</span>
           </CardTitle>
-          <div className="flex items-center gap-2 flex-wrap">
-            {hasContent && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClear}
-                disabled={disabled}
-                data-testid="button-clear-brand"
-              >
-                Clear
-              </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="h-8 px-2 text-muted-foreground hover:text-foreground"
+            data-testid="button-toggle-brand"
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              data-testid="button-toggle-brand"
-            >
-              {isExpanded ? (
-                <>
-                  <ChevronUp className="h-4 w-4 mr-1" />
-                  Collapse
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-4 w-4 mr-1" />
-                  Expand
-                </>
-              )}
-            </Button>
-          </div>
+          </Button>
         </div>
-        
-        {savedProfiles && savedProfiles.length > 0 && (
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            <Label className="text-sm text-muted-foreground">Saved Profiles:</Label>
-            <Select
-              value={brandStyle.brandName || ""}
-              onValueChange={(value) => onLoadProfile(value)}
-              disabled={disabled}
-            >
-              <SelectTrigger className="w-48" data-testid="select-brand-profile">
-                <SelectValue placeholder="Select a profile" />
-              </SelectTrigger>
-              <SelectContent>
-                {savedProfiles.map((profile) => (
-                  <SelectItem key={profile.brandName} value={profile.brandName}>
-                    {profile.brandName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleNewProfileClick}
-              disabled={disabled}
-              title="New profile"
-              data-testid="button-new-profile"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-        
-        {!isExpanded && hasContent && (
-          <div className="flex items-center gap-3 mt-2">
-            {brandStyle.logoDataUrl && (
-              <img 
-                src={brandStyle.logoDataUrl} 
-                alt="Brand logo" 
-                className="h-6 w-6 object-contain rounded"
-              />
-            )}
-            <p className="text-sm text-muted-foreground">
-              Brand guidelines{brandStyle.logoDataUrl ? " and logo" : ""} will be applied to all generated images
-            </p>
-          </div>
+
+        {/* Collapsed summary */}
+        {!isExpanded && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {hasContent
+              ? `${brandStyle.brandName || 'Brand'} settings configured`
+              : "Click to configure brand settings"
+            }
+          </p>
         )}
       </CardHeader>
       
       {isExpanded && (
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Define your brand's visual identity. These guidelines will be automatically applied to every image generation prompt.
-          </p>
+        <CardContent className="px-4 pb-4 pt-2 space-y-4">
+          {/* Saved Profiles */}
+          {savedProfiles && savedProfiles.length > 0 && (
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Saved Profiles</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  list="saved-profiles"
+                  placeholder="Select or type profile name"
+                  value={brandStyle.brandName || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const profile = savedProfiles.find(p => p.brandName === val);
+                    if (profile) {
+                      onLoadProfile(val);
+                    } else {
+                      onChange({ ...brandStyle, brandName: val });
+                    }
+                  }}
+                  disabled={disabled}
+                  className="flex-1 h-9 text-sm"
+                  data-testid="input-brand-profile"
+                />
+                <datalist id="saved-profiles">
+                  {savedProfiles.map((profile) => (
+                    <option key={profile.brandName} value={profile.brandName} />
+                  ))}
+                </datalist>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={handleNewProfileClick}
+                  disabled={disabled}
+                  title="New profile"
+                  data-testid="button-new-profile"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
           
           <div className="space-y-4">
             <div className="space-y-2">
@@ -407,25 +413,25 @@ export default function BrandGuidelines({
                 <Type className="h-4 w-4" />
                 Typography / Font Style
               </Label>
-              <Select
+              <Input
+                id="fontStyle"
+                list="fontStyle-options"
+                placeholder="Select or type a typography style"
                 value={brandStyle.fontStyle}
-                onValueChange={(value) => handleChange("fontStyle", value)}
+                onChange={(e) => handleChange("fontStyle", e.target.value)}
                 disabled={disabled}
-              >
-                <SelectTrigger data-testid="select-font-style">
-                  <SelectValue placeholder="Select a typography style" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TYPOGRAPHY_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{option.label}</span>
-                        <span className="text-xs text-muted-foreground">{option.description}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                data-testid="input-font-style"
+              />
+              <datalist id="fontStyle-options">
+                {TYPOGRAPHY_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label} - {option.description}
+                  </option>
+                ))}
+              </datalist>
+              <p className="text-xs text-muted-foreground">
+                Select from suggestions or type your own style
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -433,25 +439,66 @@ export default function BrandGuidelines({
                 <Sparkles className="h-4 w-4" />
                 Visual Style / Aesthetic
               </Label>
-              <Select
+              <Input
+                id="visualStyle"
+                list="visualStyle-options"
+                placeholder="Select or type a visual style"
                 value={brandStyle.visualStyle}
-                onValueChange={(value) => handleChange("visualStyle", value)}
+                onChange={(e) => handleChange("visualStyle", e.target.value)}
                 disabled={disabled}
-              >
-                <SelectTrigger data-testid="select-visual-style">
-                  <SelectValue placeholder="Select a visual style" />
-                </SelectTrigger>
-                <SelectContent>
-                  {VISUAL_STYLE_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{option.label}</span>
-                        <span className="text-xs text-muted-foreground">{option.description}</span>
-                      </div>
-                    </SelectItem>
+                data-testid="input-visual-style"
+              />
+              <datalist id="visualStyle-options">
+                {VISUAL_STYLE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label} - {option.description}
+                  </option>
+                ))}
+              </datalist>
+              <p className="text-xs text-muted-foreground">
+                Select from suggestions or type your own style
+              </p>
+            </div>
+
+            {/* Location & Income Level */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="targetLocation" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Target Market / Location
+                </Label>
+                <Input
+                  id="targetLocation"
+                  placeholder="e.g., USA, GCC, Europe, Global"
+                  value={brandStyle.targetLocation}
+                  onChange={(e) => handleChange("targetLocation", e.target.value)}
+                  disabled={disabled}
+                  data-testid="input-target-location"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="targetIncome" className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Target Income Level
+                </Label>
+                <Input
+                  id="targetIncome"
+                  list="targetIncome-options"
+                  placeholder="Select or type income level"
+                  value={brandStyle.targetIncome}
+                  onChange={(e) => handleChange("targetIncome", e.target.value)}
+                  disabled={disabled}
+                  data-testid="input-income-level"
+                />
+                <datalist id="targetIncome-options">
+                  {INCOME_LEVEL_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label} - {option.description}
+                    </option>
                   ))}
-                </SelectContent>
-              </Select>
+                </datalist>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -466,26 +513,6 @@ export default function BrandGuidelines({
                 rows={2}
                 data-testid="input-additional-notes"
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="targetAudience" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Target Audience
-              </Label>
-              <Textarea
-                id="targetAudience"
-                placeholder="e.g., Young professionals aged 25-35, health-conscious millennials, luxury shoppers, small business owners"
-                value={brandStyle.targetAudience}
-                onChange={(e) => handleChange("targetAudience", e.target.value)}
-                disabled={disabled}
-                className="resize-none"
-                rows={2}
-                data-testid="input-target-audience"
-              />
-              <p className="text-xs text-muted-foreground">
-                Define your target audience to generate more relevant image prompts
-              </p>
             </div>
           </div>
         </CardContent>

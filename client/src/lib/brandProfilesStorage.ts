@@ -13,6 +13,11 @@ export interface BrandProfile {
   targetAudience: string;
   logoDataUrl: string | null;
   lastModified: number;
+  // New generic audience fields
+  targetLocation?: string;
+  targetIncome?: string;
+  targetInterests?: string;
+  targetLanguage?: string;
 }
 
 const STORAGE_KEY = "brand_profiles";

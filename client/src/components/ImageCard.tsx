@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Download, AlertCircle, Maximize2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -17,9 +18,11 @@ interface ImageCardProps {
   index: number;
   onDownload?: (image: GeneratedImage) => void;
   onPreview?: (image: GeneratedImage) => void;
+  isSelected?: boolean;
+  onSelect?: (id: string, selected: boolean) => void;
 }
 
-export default function ImageCard({ image, index, onDownload, onPreview }: ImageCardProps) {
+export default function ImageCard({ image, index, onDownload, onPreview, isSelected = false, onSelect }: ImageCardProps) {
   const [showPrompt, setShowPrompt] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -69,16 +72,26 @@ export default function ImageCard({ image, index, onDownload, onPreview }: Image
               onLoad={() => setImageLoaded(true)}
               data-testid={`img-generated-${image.id}`}
             />
-            
-            <div 
+
+            <div
               className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center gap-2 transition-opacity"
               style={{ opacity: showPrompt ? 1 : 0, visibility: showPrompt ? 'visible' : 'hidden' }}
               onMouseLeave={() => setShowPrompt(false)}
             >
               <p className="absolute inset-0 p-4 text-sm text-white overflow-y-auto">{image.prompt}</p>
             </div>
-            
-            <div 
+
+            {/* Selection checkbox */}
+            <div className="absolute top-2 left-2">
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={(checked) => onSelect?.(image.id, checked as boolean)}
+                className="h-5 w-5 border-2 border-white bg-white/80 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                data-testid={`checkbox-select-${image.id}`}
+              />
+            </div>
+
+            <div
               className="absolute top-2 right-2 flex gap-1 transition-opacity"
               style={{ opacity: 1, visibility: 'visible' }}
             >

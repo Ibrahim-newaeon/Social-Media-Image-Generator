@@ -18,7 +18,7 @@ export default function ChatAssistant({ onSendMessage }: ChatAssistantProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! I'm your AI assistant. I can help you create better image prompts for your furniture brand. What would you like to know?",
+      content: "Hello! I'm your AI assistant. I can help you create better image prompts for your brand. What would you like to know?",
       timestamp: Date.now(),
     },
   ]);
@@ -77,22 +77,26 @@ export default function ChatAssistant({ onSendMessage }: ChatAssistantProps) {
     const lowerQuery = query.toLowerCase();
 
     if (lowerQuery.includes("prompt") || lowerQuery.includes("write")) {
-      return "For furniture prompts, be specific about:\n• Material (wood, marble, velvet)\n• Style (modern, traditional, minimalist)\n• Setting (living room, bedroom)\n• Lighting (natural, warm, studio)\n• Composition (centered, angled)\n\nExample: 'Modern grey velvet sectional sofa in bright minimalist living room with natural sunlight, neutral color palette'";
+      return "For effective image prompts, be specific about:\n• Subject (main focus of the image)\n• Style (modern, traditional, minimalist, luxury)\n• Setting/Background (studio, outdoor, lifestyle)\n• Lighting (natural, warm, studio, dramatic)\n• Composition (centered, angled, close-up)\n• Mood (elegant, playful, professional)\n\nExample: 'Elegant product photography of [your product] on marble surface with soft natural lighting, minimalist composition, luxury brand aesthetic'";
     }
 
     if (lowerQuery.includes("color") || lowerQuery.includes("palette")) {
-      return "For GCC markets, these color palettes work well:\n• Luxury: Champagne gold, navy, cream\n• Modern: White, light wood, grey\n• Traditional: Burgundy, gold, deep green\n• Romantic: Blush, rose gold, champagne\n\nAlways consider cultural preferences - warm tones are generally preferred.";
+      return "Popular color palettes by brand style:\n• Luxury: Champagne gold, navy, cream, black\n• Modern: White, grey, light wood tones\n• Natural/Organic: Earth tones, sage green, cream\n• Bold/Energetic: Vibrant colors, high contrast\n• Romantic: Blush, rose gold, soft pastels\n\nTip: Use your brand colors consistently for recognition.";
     }
 
     if (lowerQuery.includes("audience") || lowerQuery.includes("market")) {
-      return "Key tips for GCC audiences:\n• Kuwait: Modern with Arabic touches, family-friendly\n• Saudi: Mix of traditional and contemporary, prayer corners\n• Qatar: Ultra-luxury, gallery-style presentations\n\nRemember: No human figures in images, bilingual text (Arabic primary), and cultural sensitivity are important.";
+      return "Tips for targeting different audiences:\n• Define demographics (age, gender, income)\n• Consider cultural preferences for your market\n• Match visual style to audience expectations\n• Use appropriate language/text\n• Consider local trends and preferences\n\nUse the Target Audience section to customize prompts automatically.";
     }
 
     if (lowerQuery.includes("logo") || lowerQuery.includes("watermark")) {
-      return "Logo watermark best practices:\n• Use PNG with transparency\n• Position: Bottom-right is standard\n• Size: 20-30% of image width\n• Opacity: 70-90% for visibility\n\nMake sure your logo contrasts well with typical furniture backgrounds.";
+      return "Logo watermark best practices:\n• Use PNG with transparency\n• Position: Bottom-right is standard\n• Size: 20-30% of image width\n• Opacity: 70-90% for visibility\n\nMake sure your logo contrasts well with your typical image backgrounds.";
     }
 
-    return "I can help you with:\n• Writing effective prompts\n• Choosing color palettes\n• Understanding GCC audience preferences\n• Logo watermark settings\n\nWhat would you like to know more about?";
+    if (lowerQuery.includes("suggest") || lowerQuery.includes("ai")) {
+      return "AI Suggest works best when you provide:\n• Brand name and identity\n• Primary/secondary colors\n• Visual style preference\n• Target audience details\n• Industry/product type\n\nThe more details you fill in, the better the AI-generated prompts will be!";
+    }
+
+    return "I can help you with:\n• Writing effective image prompts\n• Choosing color palettes\n• Defining your target audience\n• Logo watermark settings\n• Using AI Suggest effectively\n\nWhat would you like to know more about?";
   };
 
   return (
