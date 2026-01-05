@@ -12,6 +12,7 @@ import TargetAudience from "@/components/TargetAudience";
 import LogoUploader, { LogoSettings, getDefaultLogoSettings } from "@/components/LogoUploader";
 import ReferenceImages, { ReferenceSettings, buildReferencePromptInsert } from "@/components/ReferenceImages";
 import ChatAssistant from "@/components/ChatAssistant";
+import LandingPage from "@/components/LandingPage";
 import { GeneratedImage } from "@/components/ImageCard";
 import { useToast } from "@/hooks/use-toast";
 import { overlayLogoOnImage } from "@/lib/logoOverlay";
@@ -45,10 +46,12 @@ import {
   Trash2,
   History,
   Images,
+  Home as HomeIcon,
 } from "lucide-react";
 
 export default function Home() {
   // State
+  const [showLanding, setShowLanding] = useState(true);
   const [prompts, setPrompts] = useState("");
   const [images, setImages] = useState<GeneratedImage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -522,6 +525,11 @@ export default function Home() {
   const promptCount = parsePrompts().length;
   const totalGenerated = images.filter((img) => img.status === "completed").length;
 
+  // Show landing page
+  if (showLanding) {
+    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left Sidebar */}
@@ -531,11 +539,11 @@ export default function Home() {
         <div className="p-4 border-b border-border/50 flex items-center justify-between bg-white rounded-t-lg">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 shadow-lg neon-glow-teal">
-              <ImagePlus className="w-5 h-5 text-white" />
+              <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-lg text-teal-600">AI Studio</h1>
-              <p className="text-xs text-gray-600">Bulk Image Generator</p>
+              <h1 className="font-bold text-lg text-teal-600">al-ai.ai</h1>
+              <p className="text-xs text-gray-600">Social Medias Creative Generator</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setSidebarCollapsed(true)} className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100">
@@ -615,7 +623,11 @@ export default function Home() {
           )}
         </div>
 
-        <div className="p-3 border-t">
+        <div className="p-3 border-t space-y-1">
+          <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => setShowLanding(true)}>
+            <HomeIcon className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
           <Button variant="ghost" size="sm" className="w-full justify-start" onClick={toggleTheme}>
             {isDark ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
             {isDark ? "Light Mode" : "Dark Mode"}
