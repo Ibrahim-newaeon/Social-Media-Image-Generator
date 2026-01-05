@@ -171,7 +171,7 @@ export default function ReferenceImages({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
             <Eye className="h-4 w-4 text-primary" />
-            <span>Reference Images</span>
+            <span className="text-primary">Reference Images</span>
           </CardTitle>
           <Button
             variant="ghost"

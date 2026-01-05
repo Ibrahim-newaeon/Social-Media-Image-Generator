@@ -195,7 +195,7 @@ export default function BrandGuidelines({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
             <Palette className="h-4 w-4 text-primary" />
-            <span>Brand Style Guidelines</span>
+            <span className="text-primary">Brand Style Guidelines</span>
           </CardTitle>
           <Button
             variant="ghost"

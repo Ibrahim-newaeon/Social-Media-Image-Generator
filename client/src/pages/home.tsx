@@ -497,17 +497,17 @@ export default function Home() {
       <aside
         className={`flex flex-col bg-card border-r border-border/50 h-screen sticky top-0 transition-all duration-300 ${sidebarCollapsed ? "w-0 overflow-hidden" : "w-[340px] min-w-[340px]"}`}
       >
-        <div className="p-4 border-b border-border/50 flex items-center justify-between">
+        <div className="p-4 border-b border-border/50 flex items-center justify-between bg-white rounded-t-lg">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg neon-glow-cyan">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 shadow-lg neon-glow-teal">
               <ImagePlus className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-lg text-foreground">AI Studio</h1>
-              <p className="text-xs text-muted-foreground">Bulk Image Generator</p>
+              <h1 className="font-bold text-lg text-teal-600">AI Studio</h1>
+              <p className="text-xs text-gray-600">Bulk Image Generator</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setSidebarCollapsed(true)} className="h-8 w-8 text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" size="icon" onClick={() => setSidebarCollapsed(true)} className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100">
             <PanelLeftClose className="w-4 h-4" />
           </Button>
         </div>

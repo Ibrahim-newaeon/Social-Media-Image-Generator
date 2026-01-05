@@ -139,7 +139,7 @@ export default function TargetAudience({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
             <Users className="h-4 w-4 text-primary" />
-            <span>Target Audience</span>
+            <span className="text-primary">Target Audience</span>
           </CardTitle>
           <Button
             variant="ghost"

@@ -12,46 +12,46 @@
 
   /* Background: #05060A */
   --background: 222 33% 3%;
-  /* Text primary: #EAF0FF */
-  --foreground: 222 100% 96%;
+  /* Text primary: White */
+  --foreground: 0 0% 100%;
   /* Border: #1F2A44 */
   --border: 222 38% 20%;
 
   /* Surface/card: #0B1020 */
   --card: 222 50% 8%;
-  --card-foreground: 222 100% 96%;
+  --card-foreground: 0 0% 100%;
   --card-border: 222 38% 20%;
 
   /* Sidebar */
   --sidebar: 222 50% 6%;
-  --sidebar-foreground: 222 100% 96%;
+  --sidebar-foreground: 0 0% 100%;
   --sidebar-border: 222 38% 20%;
-  /* Neon Cyan: #00E5FF */
-  --sidebar-primary: 187 100% 50%;
-  --sidebar-primary-foreground: 222 33% 3%;
+  /* Teal: #14B8A6 */
+  --sidebar-primary: 173 80% 40%;
+  --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 222 38% 15%;
-  --sidebar-accent-foreground: 222 100% 96%;
-  --sidebar-ring: 187 100% 50%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 173 80% 40%;
 
   /* Popover */
   --popover: 222 50% 8%;
-  --popover-foreground: 222 100% 96%;
+  --popover-foreground: 0 0% 100%;
   --popover-border: 222 38% 20%;
 
-  /* Primary: Neon Cyan #00E5FF */
-  --primary: 187 100% 50%;
-  --primary-foreground: 222 33% 3%;
+  /* Primary: Teal #14B8A6 */
+  --primary: 173 80% 40%;
+  --primary-foreground: 0 0% 100%;
 
   /* Secondary */
   --secondary: 222 38% 15%;
-  --secondary-foreground: 222 100% 96%;
+  --secondary-foreground: 0 0% 100%;
 
-  /* Muted: Text secondary #9AA7C7 */
+  /* Muted */
   --muted: 222 38% 15%;
-  --muted-foreground: 222 29% 69%;
+  --muted-foreground: 220 20% 75%;
 
-  /* Accent: Electric Blue #3B82F6 */
-  --accent: 217 91% 60%;
+  /* Accent: Teal */
+  --accent: 173 80% 40%;
   --accent-foreground: 0 0% 100%;
 
   /* Destructive: #FF3B3B */
@@ -59,17 +59,18 @@
   --destructive-foreground: 0 0% 100%;
 
   /* Input */
-  --input: 222 38% 15%;
-  --ring: 187 100% 50%;
+  --input: 222 38% 18%;
+  --ring: 173 80% 40%;
 
   /* Charts - Neon colors */
-  --chart-1: 187 100% 50%; /* Neon Cyan */
+  --chart-1: 173 80% 40%; /* Teal */
   --chart-2: 217 91% 60%;  /* Electric Blue */
   --chart-3: 271 91% 65%;  /* Neon Purple */
   --chart-4: 120 100% 54%; /* Neon Green */
   --chart-5: 312 100% 59%; /* Hot Pink */
 
   /* Neon accent colors */
+  --neon-teal: 173 80% 40%;
   --neon-cyan: 187 100% 50%;
   --neon-blue: 217 91% 60%;
   --neon-purple: 271 91% 65%;
@@ -82,7 +83,7 @@
   --success: 120 100% 54%;
   --warning: 52 98% 64%;
   --error: 0 100% 62%;
-  --info: 187 100% 50%;
+  --info: 173 80% 40%;
 
   --font-sans: 'Poppins', sans-serif;
   --font-serif: 'Poppins', sans-serif;
@@ -99,6 +100,7 @@
   --shadow-2xl: 0px 16px 48px 0px rgba(0,0,0, 0.8);
 
   /* Neon glow effects */
+  --glow-teal: 0 0 20px rgba(20, 184, 166, 0.4);
   --glow-cyan: 0 0 20px rgba(0, 229, 255, 0.3);
   --glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
   --glow-purple: 0 0 20px rgba(168, 85, 247, 0.3);
@@ -161,6 +163,10 @@
   }
 
   /* Neon glow utilities */
+  .neon-glow-teal {
+    box-shadow: var(--glow-teal);
+  }
+
   .neon-glow-cyan {
     box-shadow: var(--glow-cyan);
   }
@@ -180,6 +186,10 @@
   .neon-text {
     color: hsl(var(--primary));
     text-shadow: 0 0 10px hsl(var(--primary) / 0.5);
+  }
+
+  .text-teal {
+    color: hsl(173 80% 40%);
   }
 
   /* Elevate system */
