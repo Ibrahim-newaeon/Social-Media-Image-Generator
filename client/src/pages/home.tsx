@@ -599,15 +599,15 @@ export default function Home() {
       )}
 
       <main className="flex-1 min-h-screen">
-        <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b px-6 py-4">
+        <header className="sticky top-0 z-10 bg-white border-b px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold">Create Images</h2>
-              <p className="text-sm text-muted-foreground">Enter your prompts and generate AI images in bulk</p>
+              <h2 className="text-xl font-semibold text-teal-600">Create Images</h2>
+              <p className="text-sm text-gray-600">Enter your prompts and generate AI images in bulk</p>
             </div>
             {isGenerating && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Sparkles className="w-4 h-4 animate-pulse text-primary" />
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Sparkles className="w-4 h-4 animate-pulse text-teal-500" />
                 <span>Generating...</span>
               </div>
             )}
@@ -623,17 +623,48 @@ export default function Home() {
 
             <div>
               <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "generated" | "history")}>
-                <TabsList className="mb-4">
-                  <TabsTrigger value="generated">
-                    <Images className="w-4 h-4 mr-2" />
-                    Generated
-                  </TabsTrigger>
-                  <TabsTrigger value="history">
-                    <History className="w-4 h-4 mr-2" />
-                    History
-                    {history.length > 0 && <span className="ml-2 text-xs text-muted-foreground">({history.length})</span>}
-                  </TabsTrigger>
-                </TabsList>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Images className="w-5 h-5 text-muted-foreground" />
+                    Generated Images
+                    {images.filter(img => img.status === 'completed').length > 0 && (
+                      <span className="text-sm font-normal text-muted-foreground">
+                        ({images.filter(img => img.status === 'completed').length})
+                      </span>
+                    )}
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={handleDownloadAll}
+                      disabled={images.filter(img => img.status === 'completed').length === 0 || isDownloading}
+                      className="bg-teal-600 hover:bg-teal-700"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      {isDownloading ? 'Preparing...' : 'Download ZIP'}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearAll}
+                      disabled={images.length === 0}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                    <TabsList>
+                      <TabsTrigger value="generated">
+                        <Images className="w-4 h-4 mr-2" />
+                        Generated
+                      </TabsTrigger>
+                      <TabsTrigger value="history">
+                        <History className="w-4 h-4 mr-2" />
+                        History
+                        {history.length > 0 && <span className="ml-2 text-xs text-muted-foreground">({history.length})</span>}
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
+                </div>
 
                 <TabsContent value="generated">
                   <ImageGallery
