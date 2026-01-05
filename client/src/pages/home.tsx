@@ -71,6 +71,7 @@ export default function Home() {
   const [isDark, setIsDark] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [activeTab, setActiveTab] = useState<"generated" | "history">("generated");
+  const [selectedImageIds, setSelectedImageIds] = useState<Set<string>>(new Set());
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus>({
     current: 0,
     total: 0,
@@ -438,11 +439,21 @@ export default function Home() {
       return;
     }
 
+    // If some images are selected, download only selected; otherwise download all
+    const imagesToDownload = selectedImageIds.size > 0
+      ? completedImages.filter((img) => selectedImageIds.has(img.id))
+      : completedImages;
+
+    if (imagesToDownload.length === 0) {
+      toast({ title: "No images selected", description: "Select images to download or download all.", variant: "destructive" });
+      return;
+    }
+
     setIsDownloading(true);
     try {
       const zip = new JSZip();
-      for (let i = 0; i < completedImages.length; i++) {
-        const image = completedImages[i];
+      for (let i = 0; i < imagesToDownload.length; i++) {
+        const image = imagesToDownload[i];
         if (!image.imageUrl) continue;
         try {
           const blob = base64ToBlob(image.imageUrl);
@@ -453,7 +464,14 @@ export default function Home() {
       }
       const content = await zip.generateAsync({ type: "blob" });
       saveAs(content, `generated-images-${Date.now()}.zip`);
-      toast({ title: "Download complete", description: `Downloaded ${completedImages.length} images as ZIP.` });
+      const downloadMsg = selectedImageIds.size > 0
+        ? `Downloaded ${imagesToDownload.length} selected images as ZIP.`
+        : `Downloaded ${imagesToDownload.length} images as ZIP.`;
+      toast({ title: "Download complete", description: downloadMsg });
+      // Clear selection after download
+      if (selectedImageIds.size > 0) {
+        setSelectedImageIds(new Set());
+      }
     } catch (error) {
       toast({ title: "Download failed", description: "Could not create ZIP file.", variant: "destructive" });
     } finally {
@@ -461,8 +479,21 @@ export default function Home() {
     }
   };
 
+  const handleImageSelect = (id: string, selected: boolean) => {
+    setSelectedImageIds((prev) => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(id);
+      } else {
+        newSet.delete(id);
+      }
+      return newSet;
+    });
+  };
+
   const handleClearAll = () => {
     setImages([]);
+    setSelectedImageIds(new Set());
     setGenerationStatus({ current: 0, total: 0, completed: 0, failed: 0 });
   };
 
@@ -634,6 +665,11 @@ export default function Home() {
                     )}
                   </h3>
                   <div className="flex items-center gap-3">
+                    {selectedImageIds.size > 0 && (
+                      <span className="text-sm text-teal-600 font-medium">
+                        {selectedImageIds.size} selected
+                      </span>
+                    )}
                     <Button
                       variant="default"
                       size="sm"
@@ -642,7 +678,7 @@ export default function Home() {
                       className="bg-teal-600 hover:bg-teal-700"
                     >
                       <Download className="w-4 h-4 mr-2" />
-                      {isDownloading ? 'Preparing...' : 'Download ZIP'}
+                      {isDownloading ? 'Preparing...' : selectedImageIds.size > 0 ? `Download ${selectedImageIds.size} Selected` : 'Download ZIP'}
                     </Button>
                     <Button
                       variant="ghost"
@@ -674,6 +710,8 @@ export default function Home() {
                     onClearAll={handleClearAll}
                     onPreview={setPreviewImage}
                     isDownloading={isDownloading}
+                    selectedIds={selectedImageIds}
+                    onSelect={handleImageSelect}
                   />
                 </TabsContent>
 

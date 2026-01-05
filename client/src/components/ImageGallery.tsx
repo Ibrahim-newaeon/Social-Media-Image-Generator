@@ -10,12 +10,16 @@ interface ImageGalleryProps {
   onClearAll: () => void;
   onPreview: (image: GeneratedImage) => void;
   isDownloading?: boolean;
+  selectedIds?: Set<string>;
+  onSelect?: (id: string, selected: boolean) => void;
 }
 
 export default function ImageGallery({
   images,
   onDownload,
   onPreview,
+  selectedIds = new Set(),
+  onSelect,
 }: ImageGalleryProps) {
   return (
     <Card className="h-full flex flex-col border-0 shadow-none bg-transparent" data-testid="card-image-gallery">
@@ -36,6 +40,8 @@ export default function ImageGallery({
                   index={index}
                   onDownload={onDownload}
                   onPreview={onPreview}
+                  isSelected={selectedIds.has(image.id)}
+                  onSelect={onSelect}
                 />
               ))}
             </div>
