@@ -2,9 +2,16 @@ import { useRef, type ChangeEvent } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Image, Upload, X, Info } from "lucide-react";
+
+const POSITION_OPTIONS = [
+  { value: "bottom-right", label: "Bottom-Right" },
+  { value: "bottom-left", label: "Bottom-Left" },
+  { value: "top-right", label: "Top-Right" },
+  { value: "top-left", label: "Top-Left" },
+];
 
 export interface LogoSettings {
   url: string;
@@ -61,22 +68,23 @@ export default function LogoUploader({
   };
 
   return (
-    <Card className="border-0 shadow-lg">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-emerald-500/10">
-            <Image className="w-5 h-5 text-emerald-500" />
-          </div>
-          Logo Watermark
+    <Card className="border-border/50 bg-card/50">
+      <CardHeader className="pb-2 px-4 pt-4">
+        <CardTitle className="flex items-center gap-2 text-base font-semibold">
+          <Image className="h-4 w-4 text-primary" />
+          <span>Logo Watermark</span>
         </CardTitle>
+        {!settings.url && (
+          <p className="text-xs text-muted-foreground mt-1">Add logo to generated images</p>
+        )}
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="px-4 pb-4 pt-2 space-y-4">
         {/* Upload Area */}
         <div
           onClick={() => !disabled && fileInputRef.current?.click()}
           className={`
-            relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
-            ${settings.url ? "border-emerald-300 bg-emerald-50/50 dark:bg-emerald-950/20" : "border-muted-foreground/25 hover:border-emerald-400"}
+            relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all
+            ${settings.url ? "border-primary/50 bg-primary/5" : "border-border hover:border-primary/50"}
             ${disabled ? "opacity-50 cursor-not-allowed" : ""}
           `}
         >
@@ -124,21 +132,24 @@ export default function LogoUploader({
             {/* Position */}
             <div className="space-y-2">
               <Label className="text-xs">Position</Label>
-              <Select
-                value={settings.position}
-                onValueChange={(value) => updateSetting("position", value as LogoSettings["position"])}
+              <Input
+                list="position-options"
+                value={POSITION_OPTIONS.find(o => o.value === settings.position)?.label || settings.position}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const option = POSITION_OPTIONS.find(o => o.label === val || o.value === val);
+                  if (option) {
+                    updateSetting("position", option.value as LogoSettings["position"]);
+                  }
+                }}
                 disabled={disabled}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bottom-right">Bottom-Right</SelectItem>
-                  <SelectItem value="bottom-left">Bottom-Left</SelectItem>
-                  <SelectItem value="top-right">Top-Right</SelectItem>
-                  <SelectItem value="top-left">Top-Left</SelectItem>
-                </SelectContent>
-              </Select>
+                className="h-9 text-sm"
+              />
+              <datalist id="position-options">
+                {POSITION_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.label} />
+                ))}
+              </datalist>
             </div>
 
             {/* Size */}
@@ -174,22 +185,22 @@ export default function LogoUploader({
             </div>
 
             {/* Info */}
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-xs">
-              <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 p-2 rounded-md bg-muted/50 text-xs">
+              <Info className="w-3 h-3 text-primary flex-shrink-0 mt-0.5" />
               <p className="text-muted-foreground">
-                Logo will be automatically added to all generated images at the selected position.
+                Logo will be added to all generated images.
               </p>
             </div>
 
             {/* Remove Button */}
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handleRemove}
               disabled={disabled}
-              className="w-full text-destructive hover:text-destructive"
+              className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
             >
-              <X className="w-4 h-4 mr-2" />
+              <X className="w-3 h-3 mr-2" />
               Remove Logo
             </Button>
           </>

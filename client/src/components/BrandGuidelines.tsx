@@ -189,99 +189,83 @@ export default function BrandGuidelines({
   const hasContent = Object.values(brandStyle).some((v) => v.length > 0);
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Palette className="h-5 w-5 text-muted-foreground" />
-            Brand Style Guidelines
+    <Card className="border-border/50 bg-card/50">
+      <CardHeader className="pb-2 px-4 pt-4">
+        {/* Header Row */}
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <Palette className="h-4 w-4 text-primary" />
+            <span>Brand Style Guidelines</span>
           </CardTitle>
-          <div className="flex items-center gap-2 flex-wrap">
-            {hasContent && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClear}
-                disabled={disabled}
-                data-testid="button-clear-brand"
-              >
-                Clear
-              </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="h-8 px-2 text-muted-foreground hover:text-foreground"
+            data-testid="button-toggle-brand"
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              data-testid="button-toggle-brand"
-            >
-              {isExpanded ? (
-                <>
-                  <ChevronUp className="h-4 w-4 mr-1" />
-                  Collapse
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-4 w-4 mr-1" />
-                  Expand
-                </>
-              )}
-            </Button>
-          </div>
+          </Button>
         </div>
-        
-        {savedProfiles && savedProfiles.length > 0 && (
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            <Label className="text-sm text-muted-foreground">Saved Profiles:</Label>
-            <Select
-              value={brandStyle.brandName || ""}
-              onValueChange={(value) => onLoadProfile(value)}
-              disabled={disabled}
-            >
-              <SelectTrigger className="w-48" data-testid="select-brand-profile">
-                <SelectValue placeholder="Select a profile" />
-              </SelectTrigger>
-              <SelectContent>
-                {savedProfiles.map((profile) => (
-                  <SelectItem key={profile.brandName} value={profile.brandName}>
-                    {profile.brandName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleNewProfileClick}
-              disabled={disabled}
-              title="New profile"
-              data-testid="button-new-profile"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-        
-        {!isExpanded && hasContent && (
-          <div className="flex items-center gap-3 mt-2">
-            {brandStyle.logoDataUrl && (
-              <img 
-                src={brandStyle.logoDataUrl} 
-                alt="Brand logo" 
-                className="h-6 w-6 object-contain rounded"
-              />
-            )}
-            <p className="text-sm text-muted-foreground">
-              Brand guidelines{brandStyle.logoDataUrl ? " and logo" : ""} will be applied to all generated images
-            </p>
-          </div>
+
+        {/* Collapsed summary */}
+        {!isExpanded && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {hasContent
+              ? `${brandStyle.brandName || 'Brand'} settings configured`
+              : "Click to configure brand settings"
+            }
+          </p>
         )}
       </CardHeader>
       
       {isExpanded && (
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Define your brand's visual identity. These guidelines will be automatically applied to every image generation prompt.
-          </p>
+        <CardContent className="px-4 pb-4 pt-2 space-y-4">
+          {/* Saved Profiles */}
+          {savedProfiles && savedProfiles.length > 0 && (
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Saved Profiles</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  list="saved-profiles"
+                  placeholder="Select or type profile name"
+                  value={brandStyle.brandName || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const profile = savedProfiles.find(p => p.brandName === val);
+                    if (profile) {
+                      onLoadProfile(val);
+                    } else {
+                      onChange({ ...brandStyle, brandName: val });
+                    }
+                  }}
+                  disabled={disabled}
+                  className="flex-1 h-9 text-sm"
+                  data-testid="input-brand-profile"
+                />
+                <datalist id="saved-profiles">
+                  {savedProfiles.map((profile) => (
+                    <option key={profile.brandName} value={profile.brandName} />
+                  ))}
+                </datalist>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={handleNewProfileClick}
+                  disabled={disabled}
+                  title="New profile"
+                  data-testid="button-new-profile"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
           
           <div className="space-y-4">
             <div className="space-y-2">

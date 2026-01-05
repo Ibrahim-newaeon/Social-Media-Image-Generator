@@ -495,25 +495,25 @@ export default function Home() {
     <div className="min-h-screen bg-background flex">
       {/* Left Sidebar */}
       <aside
-        className={`flex flex-col bg-card border-r h-screen sticky top-0 transition-all duration-300 ${sidebarCollapsed ? "w-0 overflow-hidden" : "w-[320px]"}`}
+        className={`flex flex-col bg-card border-r border-border/50 h-screen sticky top-0 transition-all duration-300 ${sidebarCollapsed ? "w-0 overflow-hidden" : "w-[340px] min-w-[340px]"}`}
       >
-        <div className="p-4 border-b flex items-center justify-between">
+        <div className="p-4 border-b border-border/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg neon-glow-cyan">
               <ImagePlus className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-lg">AI Studio</h1>
+              <h1 className="font-bold text-lg text-foreground">AI Studio</h1>
               <p className="text-xs text-muted-foreground">Bulk Image Generator</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setSidebarCollapsed(true)} className="h-8 w-8">
+          <Button variant="ghost" size="icon" onClick={() => setSidebarCollapsed(true)} className="h-8 w-8 text-muted-foreground hover:text-foreground">
             <PanelLeftClose className="w-4 h-4" />
           </Button>
         </div>
 
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-3">
             <BrandGuidelines
               brandStyle={brandStyle}
               onChange={setBrandStyle}
@@ -561,18 +561,18 @@ export default function Home() {
           </div>
         </ScrollArea>
 
-        <div className="p-4 border-t space-y-3">
+        <div className="p-4 border-t border-border/50 space-y-3">
           {!isGenerating ? (
             <Button
               onClick={handleGenerate}
               disabled={promptCount === 0}
-              className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg"
+              className="w-full h-11 text-base font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg neon-glow-cyan"
             >
-              <Sparkles className="w-5 h-5 mr-2" />
+              <Sparkles className="w-4 h-4 mr-2" />
               Generate {promptCount > 0 ? `${promptCount} Images` : "Images"}
             </Button>
           ) : (
-            <Button onClick={handleStop} variant="destructive" className="w-full h-12 text-lg font-semibold">
+            <Button onClick={handleStop} variant="destructive" className="w-full h-11 text-base font-semibold">
               <Square className="w-4 h-4 mr-2" />
               Stop Generation
             </Button>

@@ -165,50 +165,33 @@ export default function ReferenceImages({
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Eye className="h-5 w-5 text-muted-foreground" />
-              Reference Images
-            </CardTitle>
-            <p className="text-xs text-muted-foreground mt-1">
-              Upload images to match their style
-            </p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            {hasImages && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClear}
-                disabled={disabled || isAnalyzing}
-              >
-                Clear
-              </Button>
+    <Card className="border-border/50 bg-card/50">
+      <CardHeader className="pb-2 px-4 pt-4">
+        {/* Header Row */}
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <Eye className="h-4 w-4 text-primary" />
+            <span>Reference Images</span>
+          </CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="h-8 px-2 text-muted-foreground hover:text-foreground"
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? (
-                <>
-                  <ChevronUp className="h-4 w-4 mr-1" />
-                  Collapse
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-4 w-4 mr-1" />
-                  Expand
-                </>
-              )}
-            </Button>
-          </div>
+          </Button>
         </div>
-        {!isExpanded && getSummary() && (
-          <p className="text-sm text-muted-foreground mt-2">{getSummary()}</p>
+
+        {/* Collapsed summary */}
+        {!isExpanded && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {getSummary() || "Upload images to match their style"}
+          </p>
         )}
         {!isExpanded && data.isAnalyzed && (
           <div className="flex items-center gap-1 mt-1">
@@ -219,13 +202,13 @@ export default function ReferenceImages({
       </CardHeader>
 
       {isExpanded && (
-        <CardContent className="space-y-4">
+        <CardContent className="px-4 pb-4 pt-2 space-y-4">
           {/* Upload Area */}
           <div
             className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
               dragOver
                 ? "border-primary bg-primary/5"
-                : "border-muted-foreground/25 hover:border-muted-foreground/50"
+                : "border-border hover:border-primary/50"
             } ${disabled || isAnalyzing ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
             onClick={() => !disabled && !isAnalyzing && fileInputRef.current?.click()}
             onDrop={handleDrop}

@@ -133,55 +133,39 @@ export default function TargetAudience({
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              Target Audience
-            </CardTitle>
-            <p className="text-xs text-muted-foreground mt-1">Define who your images are for</p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            {hasContent && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClear}
-                disabled={disabled}
-                data-testid="button-clear-audience"
-              >
-                Clear
-              </Button>
+    <Card className="border-border/50 bg-card/50">
+      <CardHeader className="pb-2 px-4 pt-4">
+        {/* Header Row */}
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <Users className="h-4 w-4 text-primary" />
+            <span>Target Audience</span>
+          </CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="h-8 px-2 text-muted-foreground hover:text-foreground"
+            data-testid="button-toggle-audience"
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              data-testid="button-toggle-audience"
-            >
-              {isExpanded ? (
-                <>
-                  <ChevronUp className="h-4 w-4 mr-1" />
-                  Collapse
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-4 w-4 mr-1" />
-                  Expand
-                </>
-              )}
-            </Button>
-          </div>
+          </Button>
         </div>
-        {!isExpanded && getSummary() && (
-          <p className="text-sm text-muted-foreground mt-2">{getSummary()}</p>
+
+        {/* Collapsed summary */}
+        {!isExpanded && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {getSummary() || "Click to define target audience"}
+          </p>
         )}
       </CardHeader>
 
       {isExpanded && (
-        <CardContent className="space-y-4">
+        <CardContent className="px-4 pb-4 pt-2 space-y-4">
           {/* Demographics Row */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
