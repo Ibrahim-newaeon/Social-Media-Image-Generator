@@ -31,10 +31,10 @@ COPY --from=builder /app/dist ./dist
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV PORT=5000
+ENV PORT=5001
 
 # Expose the port
-EXPOSE 5000
+EXPOSE 5001
 
 # Start the application
 CMD ["node", "dist/index.cjs"]
