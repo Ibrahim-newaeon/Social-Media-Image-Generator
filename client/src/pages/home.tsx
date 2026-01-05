@@ -550,7 +550,6 @@ export default function Home() {
               }))}
               disabled={isGenerating}
             />
-            <LogoUploader settings={logoSettings} onChange={setLogoSettings} disabled={isGenerating} />
             <ReferenceImages
               data={referenceSettings}
               onChange={setReferenceSettings}
@@ -558,6 +557,7 @@ export default function Home() {
               isAnalyzing={isAnalyzing}
               disabled={isGenerating}
             />
+            <LogoUploader settings={logoSettings} onChange={setLogoSettings} disabled={isGenerating} />
           </div>
         </ScrollArea>
 

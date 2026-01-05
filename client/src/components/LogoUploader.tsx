@@ -72,7 +72,7 @@ export default function LogoUploader({
       <CardHeader className="pb-2 px-4 pt-4">
         <CardTitle className="flex items-center gap-2 text-base font-semibold">
           <Image className="h-4 w-4 text-primary" />
-          <span className="text-primary">Logo</span>
+          <span className="text-primary">Business Logo</span>
         </CardTitle>
         {!settings.url && (
           <p className="text-xs text-muted-foreground mt-1">Add logo to generated images</p>
