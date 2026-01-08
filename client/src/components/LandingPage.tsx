@@ -29,13 +29,13 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
     },
     {
       icon: <Target className="w-6 h-6" />,
-      title: "Target Audience",
-      description: "Tailor your content to specific demographics, locations, and interests for maximum engagement.",
+      title: "Audience Targeting",
+      description: "Tailor your content to specific demographics, markets/locations, and interests for maximum engagement.",
     },
     {
       icon: <Image className="w-6 h-6" />,
       title: "Reference Matching",
-      description: "Upload reference images and let AI match the style, mood, and composition automatically.",
+      description: "Upload reference images (if available) and let AI match the style, mood, and composition automatically.",
     },
     {
       icon: <Zap className="w-6 h-6" />,
