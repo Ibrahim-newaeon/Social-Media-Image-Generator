@@ -2,88 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
-/* DARK NEON THEME */
+/* NEW COLORFUL DARK THEME */
 :root {
+  /* Neutrals */
+  --color-bg: #070A14;
+  --color-surface: #0B1530;
+  --color-surface-2: #0E1B3B;
+  --color-border: rgba(255,255,255,.10);
+  --color-text: #EAF2FF;
+  --color-muted: #A7B6D6;
+
+  /* Brand colors (colorful set) */
+  --color-primary: #22D3EE;    /* cyan */
+  --color-secondary: #A78BFA;  /* violet */
+  --color-accent: #F472B6;     /* pink */
+  --color-accent-2: #34D399;   /* mint */
+  --color-warning: #FBBF24;    /* amber */
+  --color-danger: #FB7185;     /* coral */
+
+  /* Gradients */
+  --grad-brand: linear-gradient(90deg, #22D3EE 0%, #A78BFA 45%, #F472B6 100%);
+  --grad-cta: linear-gradient(135deg, #22D3EE 0%, #A78BFA 50%, #F472B6 100%);
+  --grad-mint: linear-gradient(135deg, #34D399 0%, #22D3EE 100%);
+  --grad-sidebar: linear-gradient(180deg, #22D3EE 0%, #A78BFA 50%, #F472B6 100%);
+
   --button-outline: rgba(255,255,255, .10);
   --badge-outline: rgba(255,255,255, .08);
   --opaque-button-border-intensity: 9;
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .08);
 
-  /* Background: #05060A */
-  --background: 222 33% 3%;
-  /* Text primary: White */
-  --foreground: 0 0% 100%;
-  /* Border: #1F2A44 */
+  /* Background: #070A14 */
+  --background: 222 40% 5%;
+  /* Text primary: #EAF2FF */
+  --foreground: 220 100% 96%;
+  /* Border */
   --border: 222 38% 20%;
 
-  /* Surface/card: #0B1020 */
-  --card: 222 50% 8%;
-  --card-foreground: 0 0% 100%;
+  /* Surface/card: #0B1530 */
+  --card: 222 55% 12%;
+  --card-foreground: 220 100% 96%;
   --card-border: 222 38% 20%;
 
   /* Sidebar */
-  --sidebar: 222 50% 6%;
-  --sidebar-foreground: 0 0% 100%;
+  --sidebar: 222 55% 10%;
+  --sidebar-foreground: 220 100% 96%;
   --sidebar-border: 222 38% 20%;
-  /* Teal: #14B8A6 */
-  --sidebar-primary: 173 80% 40%;
-  --sidebar-primary-foreground: 0 0% 100%;
+  /* Cyan primary */
+  --sidebar-primary: 187 94% 53%;
+  --sidebar-primary-foreground: 222 40% 5%;
   --sidebar-accent: 222 38% 15%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-ring: 173 80% 40%;
+  --sidebar-accent-foreground: 220 100% 96%;
+  --sidebar-ring: 187 94% 53%;
 
   /* Popover */
-  --popover: 222 50% 8%;
-  --popover-foreground: 0 0% 100%;
+  --popover: 222 55% 12%;
+  --popover-foreground: 220 100% 96%;
   --popover-border: 222 38% 20%;
 
-  /* Primary: Teal #14B8A6 */
-  --primary: 173 80% 40%;
-  --primary-foreground: 0 0% 100%;
+  /* Primary: Cyan #22D3EE */
+  --primary: 187 94% 53%;
+  --primary-foreground: 222 40% 5%;
 
-  /* Secondary */
-  --secondary: 222 38% 15%;
-  --secondary-foreground: 0 0% 100%;
+  /* Secondary: Violet #A78BFA */
+  --secondary: 263 84% 76%;
+  --secondary-foreground: 222 40% 5%;
 
   /* Muted */
   --muted: 222 38% 15%;
-  --muted-foreground: 220 20% 75%;
+  --muted-foreground: 220 35% 75%;
 
-  /* Accent: Teal */
-  --accent: 173 80% 40%;
-  --accent-foreground: 0 0% 100%;
+  /* Accent: Mint #34D399 */
+  --accent: 160 84% 52%;
+  --accent-foreground: 222 40% 5%;
 
-  /* Destructive: #FF3B3B */
-  --destructive: 0 100% 62%;
-  --destructive-foreground: 0 0% 100%;
+  /* Destructive: Coral #FB7185 */
+  --destructive: 351 95% 72%;
+  --destructive-foreground: 220 100% 96%;
 
   /* Input */
   --input: 222 38% 18%;
-  --ring: 173 80% 40%;
+  --ring: 187 94% 53%;
 
-  /* Charts - Neon colors */
-  --chart-1: 173 80% 40%; /* Teal */
-  --chart-2: 217 91% 60%;  /* Electric Blue */
-  --chart-3: 271 91% 65%;  /* Neon Purple */
-  --chart-4: 120 100% 54%; /* Neon Green */
-  --chart-5: 312 100% 59%; /* Hot Pink */
+  /* Charts - Colorful set */
+  --chart-1: 187 94% 53%; /* Cyan */
+  --chart-2: 263 84% 76%;  /* Violet */
+  --chart-3: 330 81% 70%;  /* Pink */
+  --chart-4: 160 84% 52%; /* Mint */
+  --chart-5: 43 96% 56%; /* Amber */
 
   /* Neon accent colors */
-  --neon-teal: 173 80% 40%;
-  --neon-cyan: 187 100% 50%;
-  --neon-blue: 217 91% 60%;
-  --neon-purple: 271 91% 65%;
-  --neon-pink: 312 100% 59%;
-  --neon-green: 120 100% 54%;
-  --neon-yellow: 52 98% 64%;
-  --neon-orange: 29 100% 50%;
+  --neon-cyan: 187 94% 53%;
+  --neon-violet: 263 84% 76%;
+  --neon-pink: 330 81% 70%;
+  --neon-mint: 160 84% 52%;
+  --neon-amber: 43 96% 56%;
 
   /* Status colors */
-  --success: 120 100% 54%;
-  --warning: 52 98% 64%;
-  --error: 0 100% 62%;
-  --info: 173 80% 40%;
+  --success: 160 84% 52%;
+  --warning: 43 96% 56%;
+  --error: 351 95% 72%;
+  --info: 187 94% 53%;
 
   --font-sans: 'Poppins', sans-serif;
   --font-serif: 'Poppins', sans-serif;
@@ -100,10 +119,10 @@
   --shadow-2xl: 0px 16px 48px 0px rgba(0,0,0, 0.8);
 
   /* Neon glow effects */
-  --glow-teal: 0 0 20px rgba(20, 184, 166, 0.4);
-  --glow-cyan: 0 0 20px rgba(0, 229, 255, 0.3);
-  --glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
-  --glow-purple: 0 0 20px rgba(168, 85, 247, 0.3);
+  --glow-cyan: 0 0 20px rgba(34, 211, 238, 0.4);
+  --glow-violet: 0 0 20px rgba(167, 139, 250, 0.4);
+  --glow-pink: 0 0 20px rgba(244, 114, 182, 0.4);
+  --glow-mint: 0 0 20px rgba(52, 211, 153, 0.4);
 
   --tracking-normal: 0em;
   --spacing: 0.25rem;
@@ -140,7 +159,13 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
+    background:
+      radial-gradient(700px 400px at 15% 20%, rgba(34,211,238,.28), transparent 60%),
+      radial-gradient(700px 400px at 80% 15%, rgba(167,139,250,.22), transparent 55%),
+      radial-gradient(700px 400px at 70% 85%, rgba(244,114,182,.18), transparent 60%),
+      #070A14;
+    min-height: 100vh;
   }
 
   /* Ensure dark theme by default */
@@ -163,20 +188,20 @@
   }
 
   /* Neon glow utilities */
-  .neon-glow-teal {
-    box-shadow: var(--glow-teal);
-  }
-
   .neon-glow-cyan {
     box-shadow: var(--glow-cyan);
   }
 
-  .neon-glow-blue {
-    box-shadow: var(--glow-blue);
+  .neon-glow-violet {
+    box-shadow: var(--glow-violet);
   }
 
-  .neon-glow-purple {
-    box-shadow: var(--glow-purple);
+  .neon-glow-pink {
+    box-shadow: var(--glow-pink);
+  }
+
+  .neon-glow-mint {
+    box-shadow: var(--glow-mint);
   }
 
   .neon-border {
@@ -188,8 +213,104 @@
     text-shadow: 0 0 10px hsl(var(--primary) / 0.5);
   }
 
-  .text-teal {
-    color: hsl(173 80% 40%);
+  /* Gradient text */
+  .text-gradient {
+    background: var(--grad-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Gradient CTA button */
+  .btn-gradient {
+    background: var(--grad-cta);
+    color: #071019;
+    font-weight: 700;
+    box-shadow: 0 18px 60px rgba(167,139,250,.18);
+  }
+
+  .btn-gradient:hover {
+    box-shadow: 0 20px 70px rgba(167,139,250,.25);
+  }
+
+  /* Sidebar gradient rail */
+  .sidebar-gradient-rail {
+    position: relative;
+  }
+
+  .sidebar-gradient-rail::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--grad-sidebar);
+    border-radius: 0 3px 3px 0;
+  }
+
+  /* Focus glow for cards */
+  .focus-glow-cyan:focus-within {
+    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.3), 0 0 20px rgba(34, 211, 238, 0.2);
+    border-color: rgba(34, 211, 238, 0.5);
+  }
+
+  .focus-glow-violet:focus-within {
+    box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.3), 0 0 20px rgba(167, 139, 250, 0.2);
+    border-color: rgba(167, 139, 250, 0.5);
+  }
+
+  .focus-glow-pink:focus-within {
+    box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.3), 0 0 20px rgba(244, 114, 182, 0.2);
+    border-color: rgba(244, 114, 182, 0.5);
+  }
+
+  /* Selected state with mint */
+  .selected-mint {
+    border-color: rgba(52, 211, 153, 0.5);
+    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.2);
+  }
+
+  /* Glass morphism card */
+  .glass-card {
+    background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    border: 1px solid var(--color-border);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Chip/pill styles */
+  .chip {
+    border: 1px solid var(--color-border);
+    background: rgba(255,255,255,.03);
+    padding: 9px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .chip:hover {
+    border-color: rgba(34,211,238,.45);
+    box-shadow: 0 0 0 4px rgba(34,211,238,.10);
+  }
+
+  /* Mock preview glow */
+  .mock-glow {
+    background: radial-gradient(circle at 30% 30%, rgba(34,211,238,.35), transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(167,139,250,.28), transparent 55%),
+                radial-gradient(circle at 60% 85%, rgba(244,114,182,.22), transparent 60%);
+    filter: blur(18px);
+  }
+
+  /* Hero pill */
+  .hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    background: rgba(255,255,255,.03);
+    border-radius: 999px;
+    color: var(--color-muted);
   }
 
   /* Elevate system */

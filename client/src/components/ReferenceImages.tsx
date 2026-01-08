@@ -165,13 +165,13 @@ export default function ReferenceImages({
   };
 
   return (
-    <Card className="border-border/50 bg-card/50">
+    <Card className="border-white/10 bg-[#0B1530]/50 focus-glow-pink transition-all duration-300">
       <CardHeader className="pb-2 px-4 pt-4">
         {/* Header Row */}
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
-            <Eye className="h-4 w-4 text-primary" />
-            <span className="text-primary">Reference Images (if available)</span>
+            <Eye className="h-4 w-4 text-pink-400" />
+            <span className="text-pink-400">Reference Images (if available)</span>
           </CardTitle>
           <Button
             variant="ghost"

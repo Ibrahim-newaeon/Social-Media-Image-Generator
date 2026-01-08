@@ -189,13 +189,13 @@ export default function BrandGuidelines({
   const hasContent = Object.values(brandStyle).some((v) => v.length > 0);
 
   return (
-    <Card className="border-border/50 bg-card/50">
+    <Card className="border-white/10 bg-[#0B1530]/50 focus-glow-cyan transition-all duration-300">
       <CardHeader className="pb-2 px-4 pt-4">
         {/* Header Row */}
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
-            <Palette className="h-4 w-4 text-primary" />
-            <span className="text-primary">Brand Style Guidelines</span>
+            <Palette className="h-4 w-4 text-cyan-400" />
+            <span className="text-cyan-400">Brand Style Guidelines</span>
           </CardTitle>
           <Button
             variant="ghost"

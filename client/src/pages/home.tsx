@@ -534,19 +534,19 @@ export default function Home() {
     <div className="min-h-screen bg-background flex">
       {/* Left Sidebar */}
       <aside
-        className={`flex flex-col bg-card border-r border-border/50 h-screen sticky top-0 transition-all duration-300 ${sidebarCollapsed ? "w-0 overflow-hidden" : "w-[340px] min-w-[340px]"}`}
+        className={`sidebar-gradient-rail flex flex-col bg-[#0B1530] border-r border-white/10 h-screen sticky top-0 transition-all duration-300 ${sidebarCollapsed ? "w-0 overflow-hidden" : "w-[340px] min-w-[340px]"}`}
       >
-        <div className="p-4 border-b border-border/50 flex items-center justify-between bg-white rounded-t-lg">
+        <div className="p-4 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 shadow-lg neon-glow-teal">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-400 to-violet-500 shadow-lg neon-glow-cyan">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-lg text-teal-600">al-ai.ai</h1>
-              <p className="text-xs text-gray-600">Social Medias Creative Generator</p>
+              <h1 className="font-bold text-lg text-white">al-ai.ai</h1>
+              <p className="text-xs text-cyan-400">Social Medias Creative Generator</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setSidebarCollapsed(true)} className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100">
+          <Button variant="ghost" size="icon" onClick={() => setSidebarCollapsed(true)} className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10">
             <PanelLeftClose className="w-4 h-4" />
           </Button>
         </div>
@@ -600,12 +600,12 @@ export default function Home() {
           </div>
         </ScrollArea>
 
-        <div className="p-4 border-t border-border/50 space-y-3">
+        <div className="p-4 border-t border-white/10 space-y-3">
           {!isGenerating ? (
             <Button
               onClick={handleGenerate}
               disabled={promptCount === 0}
-              className="w-full h-11 text-base font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg neon-glow-cyan"
+              className="w-full h-11 text-base font-semibold btn-gradient rounded-xl"
             >
               <Sparkles className="w-4 h-4 mr-2" />
               Generate Prompts {promptCount > 0 ? `(${promptCount})` : ""}
@@ -623,7 +623,7 @@ export default function Home() {
           )}
         </div>
 
-        <div className="p-3 border-t space-y-2">
+        <div className="p-3 border-t border-white/10 space-y-2">
           <div className="flex items-center gap-2 px-2 py-1.5">
             <input
               type="checkbox"
@@ -634,18 +634,18 @@ export default function Home() {
                   handleSaveProfile();
                 }
               }}
-              className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+              className="h-4 w-4 rounded border-white/20 bg-white/5 text-cyan-500 focus:ring-cyan-500"
               disabled={brandStyle.brandName.trim().length === 0}
             />
-            <label htmlFor="addToProfiles" className="text-sm text-muted-foreground cursor-pointer">
+            <label htmlFor="addToProfiles" className="text-sm text-[#A7B6D6] cursor-pointer">
               Add to profiles
             </label>
           </div>
-          <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => setShowLanding(true)}>
+          <Button variant="ghost" size="sm" className="w-full justify-start text-[#A7B6D6] hover:text-white hover:bg-white/10" onClick={() => setShowLanding(true)}>
             <HomeIcon className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
-          <Button variant="ghost" size="sm" className="w-full justify-start" onClick={toggleTheme}>
+          <Button variant="ghost" size="sm" className="w-full justify-start text-[#A7B6D6] hover:text-white hover:bg-white/10" onClick={toggleTheme}>
             {isDark ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
             {isDark ? "Light Mode" : "Dark Mode"}
           </Button>
@@ -659,15 +659,15 @@ export default function Home() {
       )}
 
       <main className="flex-1 min-h-screen">
-        <header className="sticky top-0 z-10 bg-white border-b px-6 py-4">
+        <header className="sticky top-0 z-10 bg-[#0B1530]/80 backdrop-blur-sm border-b border-white/10 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-teal-600">Create Images</h2>
-              <p className="text-sm text-gray-600">Enter your prompts and generate AI images in bulk</p>
+              <h2 className="text-xl font-semibold text-gradient">Create Images</h2>
+              <p className="text-sm text-[#A7B6D6]">Enter your prompts and generate AI images in bulk</p>
             </div>
             {isGenerating && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Sparkles className="w-4 h-4 animate-pulse text-teal-500" />
+              <div className="flex items-center gap-2 text-sm text-[#A7B6D6]">
+                <Sparkles className="w-4 h-4 animate-pulse text-cyan-400" />
                 <span>Generating...</span>
               </div>
             )}
@@ -695,7 +695,7 @@ export default function Home() {
                   </h3>
                   <div className="flex items-center gap-3">
                     {selectedImageIds.size > 0 && (
-                      <span className="text-sm text-teal-600 font-medium">
+                      <span className="text-sm text-emerald-400 font-medium">
                         {selectedImageIds.size} selected
                       </span>
                     )}
@@ -704,7 +704,7 @@ export default function Home() {
                       size="sm"
                       onClick={handleDownloadAll}
                       disabled={images.filter(img => img.status === 'completed').length === 0 || isDownloading}
-                      className="bg-teal-600 hover:bg-teal-700"
+                      className="bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white"
                     >
                       <Download className="w-4 h-4 mr-2" />
                       {isDownloading ? 'Preparing...' : selectedImageIds.size > 0 ? `Download ${selectedImageIds.size} Selected` : 'Download ZIP'}

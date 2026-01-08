@@ -133,13 +133,13 @@ export default function TargetAudience({
   };
 
   return (
-    <Card className="border-border/50 bg-card/50">
+    <Card className="border-white/10 bg-[#0B1530]/50 focus-glow-violet transition-all duration-300">
       <CardHeader className="pb-2 px-4 pt-4">
         {/* Header Row */}
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
-            <Users className="h-4 w-4 text-primary" />
-            <span className="text-primary">Audience</span>
+            <Users className="h-4 w-4 text-violet-400" />
+            <span className="text-violet-400">Audience</span>
           </CardTitle>
           <Button
             variant="ghost"
