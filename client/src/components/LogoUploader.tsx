@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import { Image, Upload, X, Info } from "lucide-react";
 
 const POSITION_OPTIONS = [
@@ -71,7 +72,7 @@ export default function LogoUploader({
       <CardHeader className="pb-2 px-4 pt-4">
         <CardTitle className="flex items-center gap-2 text-base font-semibold">
           <Image className="h-4 w-4 text-emerald-400" />
-          <span className="text-emerald-400">Business Logo</span>
+          <span className="text-emerald-400">Brand Logo</span>
         </CardTitle>
         {!settings.url && (
           <p className="text-xs text-muted-foreground mt-1">Add logo to generated images</p>

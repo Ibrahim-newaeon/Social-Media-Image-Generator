@@ -3,8 +3,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Upload, X, Image, Save, Trash2, Plus, MapPin, DollarSign } from "lucide-react";
-import { useState, useRef, type ChangeEvent } from "react";
+import { Palette, Type, Sparkles, ChevronDown, ChevronUp, Save, Trash2, Plus, MapPin, DollarSign } from "lucide-react";
+import { useState } from "react";
 import type { BrandProfile } from "@/lib/brandProfilesStorage";
 
 export interface BrandStyle {
@@ -141,48 +141,14 @@ export default function BrandGuidelines({
   onNewProfile,
 }: BrandGuidelinesProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const canSave = brandStyle.brandName.trim().length > 0;
 
   const handleChange = (field: keyof BrandStyle, value: string) => {
     onChange({ ...brandStyle, [field]: value });
   };
 
-  const handleClear = () => {
-    onChange(getDefaultBrandStyle());
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const handleLogoUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      onChange({ ...brandStyle, logoDataUrl: dataUrl });
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleRemoveLogo = () => {
-    onChange({ ...brandStyle, logoDataUrl: "" });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
   const handleNewProfileClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
     onNewProfile();
   };
 
@@ -268,75 +234,6 @@ export default function BrandGuidelines({
           )}
           
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Image className="h-4 w-4" />
-                Brand Logo
-              </Label>
-              <div className="text-xs text-muted-foreground space-y-1 p-3 bg-muted/30 rounded-md">
-                <p className="font-medium">Logo Specifications:</p>
-                <ul className="list-disc list-inside space-y-0.5 ml-1">
-                  <li>Position: Bottom-right corner</li>
-                  <li>Size: 25% of image width</li>
-                  <li>Padding: 3% from edges</li>
-                  <li>Format: PNG with transparency recommended</li>
-                </ul>
-              </div>
-              
-              {brandStyle.logoDataUrl ? (
-                <div className="flex items-center gap-4 p-3 border rounded-md bg-muted/30">
-                  <div 
-                    className="h-12 w-12 rounded p-1"
-                    style={{
-                      backgroundImage: 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)',
-                      backgroundSize: '8px 8px',
-                      backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px',
-                      backgroundColor: '#fff'
-                    }}
-                  >
-                    <img 
-                      src={brandStyle.logoDataUrl} 
-                      alt="Brand logo preview" 
-                      className="h-full w-full object-contain"
-                      data-testid="img-logo-preview"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Logo uploaded</p>
-                    <p className="text-xs text-muted-foreground">Will appear on all generated images</p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleRemoveLogo}
-                    disabled={disabled}
-                    data-testid="button-remove-logo"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div 
-                  className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed rounded-md cursor-pointer hover-elevate"
-                  onClick={() => !disabled && fileInputRef.current?.click()}
-                  data-testid="div-logo-upload"
-                >
-                  <Upload className="h-8 w-8 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Click to upload your logo</p>
-                  <p className="text-xs text-muted-foreground">PNG, JPG, or SVG recommended</p>
-                </div>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleLogoUpload}
-                className="hidden"
-                disabled={disabled}
-                data-testid="input-logo-file"
-              />
-            </div>
-
             <div className="space-y-2">
               <Label htmlFor="brandName">Brand Name</Label>
               <div className="flex gap-2">
