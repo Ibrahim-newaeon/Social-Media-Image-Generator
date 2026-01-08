@@ -465,7 +465,7 @@ export default function BrandGuidelines({
               <div className="space-y-2">
                 <Label htmlFor="targetLocation" className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  Target Market / Location
+                  Markets / Location
                 </Label>
                 <Input
                   id="targetLocation"
@@ -475,6 +475,9 @@ export default function BrandGuidelines({
                   disabled={disabled}
                   data-testid="input-target-location"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Can use multiple markets, separate by comma
+                </p>
               </div>
 
               <div className="space-y-2">

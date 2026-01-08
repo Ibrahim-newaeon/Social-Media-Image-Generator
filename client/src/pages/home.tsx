@@ -608,7 +608,7 @@ export default function Home() {
               className="w-full h-11 text-base font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg neon-glow-cyan"
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              Generate {promptCount > 0 ? `${promptCount} Images` : "Images"}
+              Generate Prompts {promptCount > 0 ? `(${promptCount})` : ""}
             </Button>
           ) : (
             <Button onClick={handleStop} variant="destructive" className="w-full h-11 text-base font-semibold">
@@ -623,7 +623,24 @@ export default function Home() {
           )}
         </div>
 
-        <div className="p-3 border-t space-y-1">
+        <div className="p-3 border-t space-y-2">
+          <div className="flex items-center gap-2 px-2 py-1.5">
+            <input
+              type="checkbox"
+              id="addToProfiles"
+              checked={brandStyle.brandName.trim().length > 0}
+              onChange={() => {
+                if (brandStyle.brandName.trim().length > 0) {
+                  handleSaveProfile();
+                }
+              }}
+              className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+              disabled={brandStyle.brandName.trim().length === 0}
+            />
+            <label htmlFor="addToProfiles" className="text-sm text-muted-foreground cursor-pointer">
+              Add to profiles
+            </label>
+          </div>
           <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => setShowLanding(true)}>
             <HomeIcon className="w-4 h-4 mr-2" />
             Back to Home

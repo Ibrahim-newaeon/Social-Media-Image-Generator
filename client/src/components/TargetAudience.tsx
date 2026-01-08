@@ -139,7 +139,7 @@ export default function TargetAudience({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
             <Users className="h-4 w-4 text-primary" />
-            <span className="text-primary">Target Audience</span>
+            <span className="text-primary">Audience</span>
           </CardTitle>
           <Button
             variant="ghost"
@@ -213,7 +213,7 @@ export default function TargetAudience({
             <div className="space-y-2">
               <Label htmlFor="targetLocation" className="flex items-center gap-2">
                 <MapPin className="h-3 w-3" />
-                Location / Market
+                Markets / Location
               </Label>
               <Input
                 id="targetLocation"
@@ -223,6 +223,9 @@ export default function TargetAudience({
                 disabled={disabled}
                 data-testid="input-target-location"
               />
+              <p className="text-xs text-muted-foreground">
+                Can use multiple markets, separate by comma
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="targetIncome">Income Level</Label>

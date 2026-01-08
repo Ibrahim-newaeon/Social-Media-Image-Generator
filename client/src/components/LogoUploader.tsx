@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { Image, Upload, X, Info } from "lucide-react";
 
 const POSITION_OPTIONS = [
@@ -31,7 +30,7 @@ export function getDefaultLogoSettings(): LogoSettings {
     url: "",
     position: "bottom-right",
     size: 25,
-    opacity: 80,
+    opacity: 100,
   };
 }
 
@@ -103,7 +102,6 @@ export default function LogoUploader({
                   src={settings.url}
                   alt="Logo preview"
                   className="max-w-full max-h-full object-contain"
-                  style={{ opacity: settings.opacity / 100 }}
                 />
               </div>
               <p className="text-xs text-muted-foreground">Click to replace</p>
@@ -164,22 +162,6 @@ export default function LogoUploader({
                 min={10}
                 max={50}
                 step={5}
-                disabled={disabled}
-              />
-            </div>
-
-            {/* Opacity */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs">Opacity</Label>
-                <span className="text-xs text-muted-foreground">{settings.opacity}%</span>
-              </div>
-              <Slider
-                value={[settings.opacity]}
-                onValueChange={([value]) => updateSetting("opacity", value)}
-                min={20}
-                max={100}
-                step={10}
                 disabled={disabled}
               />
             </div>
