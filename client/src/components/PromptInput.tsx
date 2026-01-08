@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Trash2, Sparkles, Loader2 } from "lucide-react";
+import { FileText, Trash2, Sparkles, Loader2, ImagePlus } from "lucide-react";
 import type { BrandStyle } from "./BrandGuidelines";
 
 interface PromptInputProps {
@@ -14,9 +14,11 @@ interface PromptInputProps {
   onChange: (value: string) => void;
   disabled?: boolean;
   brandStyle?: BrandStyle;
+  onGenerate?: () => void;
+  isGenerating?: boolean;
 }
 
-export default function PromptInput({ prompts, onChange, disabled = false, brandStyle }: PromptInputProps) {
+export default function PromptInput({ prompts, onChange, disabled = false, brandStyle, onGenerate, isGenerating = false }: PromptInputProps) {
   const [lineCount, setLineCount] = useState(0);
   const [charStats, setCharStats] = useState({ total: 0, avg: 0 });
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
@@ -228,13 +230,35 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
           )}
 
           {lineCount > 0 && (
-            <div className="flex items-center justify-between text-sm text-muted-foreground pt-2 border-t">
-              <span className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                Ready to generate
-              </span>
-              <span className="text-xs">~{charStats.avg} chars per prompt</span>
-            </div>
+            <>
+              <div className="flex items-center justify-between text-sm text-muted-foreground pt-2 border-t">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                  Ready to generate
+                </span>
+                <span className="text-xs">~{charStats.avg} chars per prompt</span>
+              </div>
+
+              {onGenerate && (
+                <Button
+                  onClick={onGenerate}
+                  disabled={disabled || isGenerating || lineCount === 0}
+                  className="w-full h-11 text-base font-semibold bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white rounded-xl mt-4"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating Images...
+                    </>
+                  ) : (
+                    <>
+                      <ImagePlus className="w-4 h-4 mr-2" />
+                      Generate Images ({lineCount})
+                    </>
+                  )}
+                </Button>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

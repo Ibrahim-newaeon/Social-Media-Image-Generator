@@ -601,16 +601,7 @@ export default function Home() {
         </ScrollArea>
 
         <div className="p-4 border-t border-white/10 space-y-3">
-          {!isGenerating ? (
-            <Button
-              onClick={handleGenerate}
-              disabled={promptCount === 0}
-              className="w-full h-11 text-base font-semibold btn-gradient rounded-xl"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              Generate Images {promptCount > 0 ? `(${promptCount})` : ""}
-            </Button>
-          ) : (
+          {isGenerating && (
             <Button onClick={handleStop} variant="destructive" className="w-full h-11 text-base font-semibold">
               <Square className="w-4 h-4 mr-2" />
               Stop Generation
@@ -677,7 +668,7 @@ export default function Home() {
         <div className="p-6 space-y-6">
           <div className="grid xl:grid-cols-2 gap-6">
             <div className="space-y-6">
-              <PromptInput prompts={prompts} onChange={setPrompts} disabled={isGenerating} brandStyle={brandStyle} />
+              <PromptInput prompts={prompts} onChange={setPrompts} disabled={isGenerating} brandStyle={brandStyle} onGenerate={handleGenerate} isGenerating={isGenerating} />
               <GenerationProgress status={generationStatus} isVisible={isGenerating || generationStatus.total > 0} />
             </div>
 
