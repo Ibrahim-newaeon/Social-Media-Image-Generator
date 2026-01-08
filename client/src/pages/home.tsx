@@ -608,7 +608,7 @@ export default function Home() {
               className="w-full h-11 text-base font-semibold btn-gradient rounded-xl"
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              Generate Prompts {promptCount > 0 ? `(${promptCount})` : ""}
+              Generate Images {promptCount > 0 ? `(${promptCount})` : ""}
             </Button>
           ) : (
             <Button onClick={handleStop} variant="destructive" className="w-full h-11 text-base font-semibold">

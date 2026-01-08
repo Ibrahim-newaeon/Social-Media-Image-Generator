@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Trash2, Sparkles, Loader2, ImagePlus } from "lucide-react";
+import { FileText, Trash2, Sparkles, Loader2 } from "lucide-react";
 import type { BrandStyle } from "./BrandGuidelines";
 
 interface PromptInputProps {
@@ -104,7 +104,7 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
     } catch (error) {
       console.error("Error loading suggestions:", error);
       toast({
-        title: "Generate Images",
+        title: "Generate Prompts",
         description: "Using sample prompts. Connect AI for personalized suggestions.",
         variant: "default",
       });
@@ -162,8 +162,8 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
                   </>
                 ) : (
                   <>
-                    <ImagePlus className="w-4 h-4 mr-2" />
-                    Generate Images
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Generate Prompts
                   </>
                 )}
               </Button>
@@ -186,7 +186,7 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
               <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
               <p className="text-muted-foreground mb-2">No prompts yet</p>
               <p className="text-sm text-muted-foreground/70 mb-4">
-                Click "Generate Images" to create prompts based on your brand, or type your own below
+                Click "Generate Prompts" to create prompts based on your brand, or type your own below
               </p>
               <Textarea
                 value={prompts}
@@ -243,8 +243,8 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <ImagePlus className="w-5 h-5 text-primary" />
-              Generate Images
+              <Sparkles className="w-5 h-5 text-primary" />
+              Generate Prompts
             </DialogTitle>
             <DialogDescription>
               How many image prompts would you like to generate?
@@ -287,8 +287,8 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
               onClick={generateSuggestions}
               className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
             >
-              <ImagePlus className="w-4 h-4 mr-2" />
-              Generate {promptCount} Images
+              <Sparkles className="w-4 h-4 mr-2" />
+              Generate {promptCount} Prompts
             </Button>
           </DialogFooter>
         </DialogContent>
