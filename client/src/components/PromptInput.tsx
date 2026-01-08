@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Trash2, Sparkles, Loader2, Wand2 } from "lucide-react";
+import { FileText, Trash2, Sparkles, Loader2, ImagePlus } from "lucide-react";
 import type { BrandStyle } from "./BrandGuidelines";
 
 interface PromptInputProps {
@@ -104,9 +104,9 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
     } catch (error) {
       console.error("Error loading suggestions:", error);
       toast({
-        title: "AI Suggest failed",
-        description: "Could not connect to AI. Check if GEMINI_API_KEY is set. Using sample prompts instead.",
-        variant: "destructive",
+        title: "Generate Images",
+        description: "Using sample prompts. Connect AI for personalized suggestions.",
+        variant: "default",
       });
       // Provide detailed fallback prompts
       const brand = brandStyle?.brandName || "your brand";
@@ -162,8 +162,8 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
                   </>
                 ) : (
                   <>
-                    <Wand2 className="w-4 h-4 mr-2" />
-                    AI Suggest
+                    <ImagePlus className="w-4 h-4 mr-2" />
+                    Generate Images
                   </>
                 )}
               </Button>
@@ -186,7 +186,7 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
               <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
               <p className="text-muted-foreground mb-2">No prompts yet</p>
               <p className="text-sm text-muted-foreground/70 mb-4">
-                Click "AI Suggest" to generate prompts based on your brand, or type your own below
+                Click "Generate Images" to create prompts based on your brand, or type your own below
               </p>
               <Textarea
                 value={prompts}
@@ -243,11 +243,11 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Wand2 className="w-5 h-5 text-primary" />
-              Generate AI Prompts
+              <ImagePlus className="w-5 h-5 text-primary" />
+              Generate Images
             </DialogTitle>
             <DialogDescription>
-              How many image prompts would you like to generate based on your brand guidelines?
+              How many image prompts would you like to generate?
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -287,8 +287,8 @@ export default function PromptInput({ prompts, onChange, disabled = false, brand
               onClick={generateSuggestions}
               className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
             >
-              <Sparkles className="w-4 h-4 mr-2" />
-              Generate {promptCount} Prompts
+              <ImagePlus className="w-4 h-4 mr-2" />
+              Generate {promptCount} Images
             </Button>
           </DialogFooter>
         </DialogContent>
