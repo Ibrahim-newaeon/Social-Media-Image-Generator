@@ -1,231 +1,161 @@
 # Dependency Audit Report
+## al-ai.ai Social Medias Creative Generator
 
-**Date:** January 3, 2026
-**Project:** Social-Media-Image-Generator
-
----
-
-## Executive Summary
-
-This audit identified **3 high-severity security vulnerabilities**, **19+ unused packages** contributing to bloat, and several outdated dependencies requiring updates.
+**Date:** January 2026  
+**Total Dependencies:** 634 (408 prod, 222 dev, 128 optional)
 
 ---
 
-## 1. Security Vulnerabilities (CRITICAL)
+## 🔴 SECURITY VULNERABILITIES (3 High)
 
-### High Severity Issues
+| Package | Severity | Issue | Fix |
+|---------|----------|-------|-----|
+| `express` | HIGH | Via qs/body-parser DoS vulnerability | Update to 4.22.1+ |
+| `body-parser` | HIGH | qs arrayLimit bypass | Update express |
+| `qs` | HIGH | Memory exhaustion DoS (CVE) | Update to 6.14.1+ |
 
-| Package | Vulnerability | Severity | Fix |
-|---------|--------------|----------|-----|
-| `qs` | arrayLimit bypass allows DoS via memory exhaustion | **HIGH** | Update to >=6.14.1 |
-| `body-parser` | Depends on vulnerable `qs` | **HIGH** | Update to >1.20.3 |
-| `express` | Depends on vulnerable `body-parser` and `qs` | **HIGH** | Update to >=4.22.1 or 5.x |
+**Action Required:** Run `npm audit fix` or update express to 4.22.1+
 
-### Recommended Fix
+---
 
+## 📦 DEPENDENCIES ANALYSIS
+
+### ✅ KEEP - Essential (Currently Used)
+
+| Package | Status | Purpose |
+|---------|--------|---------|
+| `@google/genai` | ✅ KEEP | Core AI image generation |
+| `react` / `react-dom` | ✅ KEEP | UI framework |
+| `express` | ✅ KEEP (UPDATE) | Backend server |
+| `lucide-react` | ✅ KEEP | Icons |
+| `tailwind-merge` | ✅ KEEP | CSS utilities |
+| `clsx` | ✅ KEEP | Class names |
+| `class-variance-authority` | ✅ KEEP | Component variants |
+| `date-fns` | ✅ KEEP | Date formatting |
+| `jszip` | ✅ KEEP | ZIP file creation |
+| `file-saver` | ✅ KEEP | File downloads |
+| `wouter` | ✅ KEEP | Routing |
+| `zod` | ✅ KEEP | Validation |
+| `@tanstack/react-query` | ✅ KEEP | Data fetching |
+
+### ✅ KEEP - UI Components (Actively Used)
+
+| Package | Used In |
+|---------|---------|
+| `@radix-ui/react-checkbox` | ImageCard selection |
+| `@radix-ui/react-dialog` | Modals |
+| `@radix-ui/react-label` | Form labels |
+| `@radix-ui/react-progress` | Generation progress |
+| `@radix-ui/react-scroll-area` | Scrollable areas |
+| `@radix-ui/react-select` | Dropdowns |
+| `@radix-ui/react-slider` | Logo size/opacity |
+| `@radix-ui/react-tabs` | Generated/History tabs |
+| `@radix-ui/react-toast` | Notifications |
+| `@radix-ui/react-tooltip` | Tooltips |
+| `@radix-ui/react-slot` | Component composition |
+
+### ⚠️ KEEP - shadcn/ui Components (Future Use)
+
+All other `@radix-ui/*` packages are part of the shadcn/ui component library.
+**Recommendation:** KEEP all for future UI extensibility.
+
+---
+
+## 🔴 REMOVE - Not Used
+
+| Package | Reason | Command |
+|---------|--------|---------|
+| `connect-pg-simple` | No PostgreSQL sessions | `npm uninstall connect-pg-simple` |
+| `drizzle-orm` | No database used | `npm uninstall drizzle-orm` |
+| `drizzle-zod` | No database used | `npm uninstall drizzle-zod` |
+| `drizzle-kit` | No database used | `npm uninstall drizzle-kit` |
+| `pg` | No PostgreSQL | `npm uninstall pg` |
+| `passport` | No authentication | `npm uninstall passport` |
+| `passport-local` | No authentication | `npm uninstall passport-local` |
+| `express-session` | No sessions | `npm uninstall express-session` |
+| `memorystore` | No sessions | `npm uninstall memorystore` |
+| `input-otp` | No OTP feature | `npm uninstall input-otp` |
+
+### Quick Remove Command:
 ```bash
-# Option 1: Quick fix via npm audit
-npm audit fix
-
-# Option 2: Update express to latest v4 (recommended)
-npm install express@^4.22.1
-
-# Option 3: Upgrade to Express 5 (major version change)
-npm install express@^5.2.1
+npm uninstall connect-pg-simple drizzle-orm drizzle-zod drizzle-kit pg passport passport-local express-session memorystore input-otp
 ```
 
 ---
 
-## 2. Unused Dependencies (BLOAT)
+## 🟡 REVIEW - Consider Removing
 
-### Radix UI Components - Unused (19 packages)
+| Package | Size | Used? | Recommendation |
+|---------|------|-------|----------------|
+| `recharts` | ~300KB | No | Remove if no charts |
+| `framer-motion` | ~150KB | Minimal | Keep for animations |
+| `embla-carousel-react` | ~30KB | No | Remove if no carousel |
+| `react-resizable-panels` | ~20KB | No | Remove if no panels |
+| `react-day-picker` | ~50KB | No | Remove if no dates |
+| `vaul` | ~15KB | No | Remove if no drawers |
+| `cmdk` | ~20KB | No | Remove if no command menu |
+| `react-icons` | ~5KB | Maybe | lucide-react is sufficient |
+| `ws` | ~10KB | No | Keep for future WebSocket |
 
-These packages have wrapper files in `client/src/components/ui/` but the wrappers are **never imported** by actual application code:
-
-| Package | Status | Recommendation |
-|---------|--------|----------------|
-| `@radix-ui/react-accordion` | Unused | Remove |
-| `@radix-ui/react-alert-dialog` | Unused | Remove |
-| `@radix-ui/react-aspect-ratio` | Unused | Remove |
-| `@radix-ui/react-avatar` | Unused | Remove |
-| `@radix-ui/react-checkbox` | Unused | Remove |
-| `@radix-ui/react-collapsible` | Unused | Remove |
-| `@radix-ui/react-context-menu` | Unused | Remove |
-| `@radix-ui/react-dropdown-menu` | Unused | Remove |
-| `@radix-ui/react-hover-card` | Unused | Remove |
-| `@radix-ui/react-menubar` | Unused | Remove |
-| `@radix-ui/react-navigation-menu` | Unused | Remove |
-| `@radix-ui/react-popover` | Unused | Remove |
-| `@radix-ui/react-radio-group` | Unused | Remove |
-| `@radix-ui/react-separator` | Unused | Remove |
-| `@radix-ui/react-slider` | Unused | Remove |
-| `@radix-ui/react-switch` | Unused | Remove |
-| `@radix-ui/react-tabs` | Unused | Remove |
-| `@radix-ui/react-toggle` | Unused | Remove |
-| `@radix-ui/react-toggle-group` | Unused | Remove |
-
-### Other Unused Dependencies (7 packages)
-
-| Package | Status | Notes |
-|---------|--------|-------|
-| `date-fns` | Unused | Only in build allowlist, no actual imports |
-| `react-icons` | Unused | No imports found (using `lucide-react` instead) |
-| `next-themes` | Unused | No imports found |
-| `framer-motion` | Unused | No imports found |
-| `passport` | Unused | Only in build allowlist, no actual imports |
-| `passport-local` | Unused | Only in build allowlist, no actual imports |
-| `@jridgewell/trace-mapping` | Unused | No imports found (may be transitive dep) |
-
-### Cleanup Command
-
+### Optional Remove Command:
 ```bash
-npm uninstall \
-  @radix-ui/react-accordion \
-  @radix-ui/react-alert-dialog \
-  @radix-ui/react-aspect-ratio \
-  @radix-ui/react-avatar \
-  @radix-ui/react-checkbox \
-  @radix-ui/react-collapsible \
-  @radix-ui/react-context-menu \
-  @radix-ui/react-dropdown-menu \
-  @radix-ui/react-hover-card \
-  @radix-ui/react-menubar \
-  @radix-ui/react-navigation-menu \
-  @radix-ui/react-popover \
-  @radix-ui/react-radio-group \
-  @radix-ui/react-separator \
-  @radix-ui/react-slider \
-  @radix-ui/react-switch \
-  @radix-ui/react-tabs \
-  @radix-ui/react-toggle \
-  @radix-ui/react-toggle-group \
-  date-fns \
-  react-icons \
-  next-themes \
-  framer-motion \
-  passport \
-  passport-local \
-  @jridgewell/trace-mapping
-```
-
-**Estimated reduction:** ~26 packages removed
-
----
-
-## 3. Outdated Dependencies
-
-### Major Version Updates Available
-
-| Package | Current | Latest | Breaking Changes Expected |
-|---------|---------|--------|--------------------------|
-| `express` | 4.21.2 | 5.2.1 | Yes - Express 5 has API changes |
-| `react` | 18.3.1 | 19.2.3 | Yes - React 19 has breaking changes |
-| `react-dom` | 18.3.1 | 19.2.3 | Yes - Must match React version |
-| `zod` | 3.25.76 | 4.3.4 | Yes - Zod 4 has new API |
-| `zod-validation-error` | 3.5.4 | 5.0.0 | Yes - Major version jump |
-| `framer-motion` | 11.13.1 | 12.23.26 | Yes - Major version change |
-| `date-fns` | 3.6.0 | 4.1.0 | Yes - API changes |
-| `recharts` | 2.15.2 | 3.6.0 | Yes - Major rewrite |
-| `react-day-picker` | 8.10.1 | 9.13.0 | Yes - New API |
-| `react-resizable-panels` | 2.1.7 | 4.2.0 | Yes - Major changes |
-| `tailwind-merge` | 2.6.0 | 3.4.0 | Yes - API changes |
-
-### Minor/Patch Updates (Safe to Update)
-
-| Package | Current | Latest | Risk |
-|---------|---------|--------|------|
-| `@hookform/resolvers` | 3.10.0 | 5.2.2 | Low |
-| `drizzle-orm` | 0.39.3 | 0.45.1 | Low |
-| `drizzle-zod` | 0.7.1 | 0.8.3 | Low |
-| `lucide-react` | 0.453.0 | 0.562.0 | Low |
-| `wouter` | 3.3.5 | 3.9.0 | Low |
-| `typescript` | 5.6.3 | Latest | Low |
-
-### Safe Update Command
-
-```bash
-npm update @hookform/resolvers drizzle-orm drizzle-zod lucide-react wouter typescript
+npm uninstall recharts embla-carousel-react react-resizable-panels react-day-picker vaul cmdk react-icons
 ```
 
 ---
 
-## 4. Duplicate/Redundant Functionality
-
-| Packages | Issue | Recommendation |
-|----------|-------|----------------|
-| `react-icons` + `lucide-react` | Duplicate icon libraries | Remove `react-icons` (unused) |
-| `tailwindcss-animate` + `tw-animate-css` | Possibly redundant animation utilities | Consolidate to one |
-
----
-
-## 5. Recommended Action Plan
-
-### Priority 1: Security (Do Immediately)
+## 🔧 REPLIT-SPECIFIC (Remove if not on Replit)
 
 ```bash
-npm audit fix
-# OR
-npm install express@^4.22.1
+npm uninstall @replit/vite-plugin-cartographer @replit/vite-plugin-dev-banner @replit/vite-plugin-runtime-error-modal
 ```
-
-### Priority 2: Remove Unused Dependencies
-
-1. Remove unused Radix UI packages
-2. Remove unused utility packages (`react-icons`, `next-themes`, etc.)
-3. Remove unused wrapper component files from `client/src/components/ui/`
-
-### Priority 3: Update Safe Dependencies
-
-```bash
-npm update @hookform/resolvers drizzle-orm drizzle-zod lucide-react wouter
-```
-
-### Priority 4: Evaluate Major Upgrades (Plan Separately)
-
-- **React 19**: Evaluate compatibility with Radix UI and other React libraries
-- **Express 5**: Review middleware compatibility
-- **Zod 4**: Check schema migrations needed
 
 ---
 
-## 6. Dependencies Actually In Use
+## 📊 OUTDATED PACKAGES
 
-### Radix UI (8 packages - KEEP)
+### 🔴 Critical Updates (Security)
 
-- `@radix-ui/react-dialog`
-- `@radix-ui/react-label`
-- `@radix-ui/react-progress`
-- `@radix-ui/react-scroll-area`
-- `@radix-ui/react-select`
-- `@radix-ui/react-slot`
-- `@radix-ui/react-toast`
-- `@radix-ui/react-tooltip`
+| Package | Current | Latest | Action |
+|---------|---------|--------|--------|
+| `express` | 4.21.2 | 4.22.1 | **UPDATE NOW** |
 
-### Core Application Dependencies (KEEP)
+### 🟡 Recommended Updates
 
-- `@google/genai` - AI integration
-- `@tanstack/react-query` - Data fetching
-- `express` / `express-session` - Backend server
-- `drizzle-orm` / `drizzle-zod` / `drizzle-kit` - Database ORM
-- `pg` / `connect-pg-simple` - PostgreSQL
-- `react` / `react-dom` / `react-hook-form` - Frontend framework
-- `lucide-react` - Icons
-- `jszip` / `file-saver` - Download functionality
-- `zod` / `zod-validation-error` - Validation
-- `wouter` - Routing
-- `ws` - WebSockets
-- `tailwindcss` / `tailwind-merge` - Styling
-- `vite` / `typescript` / `tsx` - Build tools
+| Package | Current | Latest |
+|---------|---------|--------|
+| `lucide-react` | 0.453.0 | 0.562.0 |
+| `@tanstack/react-query` | 5.60.5 | 5.90.16 |
+| `typescript` | 5.6.3 | 5.9.3 |
+| `wouter` | 3.3.5 | 3.9.0 |
 
 ---
 
-## Summary Statistics
+## 📈 ESTIMATED SAVINGS
 
-| Category | Count |
-|----------|-------|
-| Security vulnerabilities | 3 (high) |
-| Unused packages | 26 |
-| Major updates available | 11 |
-| Safe updates available | 6 |
-| Total dependencies | 69 (prod) + 18 (dev) = 87 |
-| Recommended to remove | 26 (~30% reduction) |
+| Action | Packages | Est. Bundle Savings |
+|--------|----------|---------------------|
+| Remove DB packages | 5 | ~50KB |
+| Remove Auth packages | 4 | ~30KB |
+| Remove unused UI | 7 | ~150KB |
+| **TOTAL** | 16 | **~230KB** |
+
+---
+
+## ✅ SUMMARY
+
+### MUST DO
+1. ✅ Run `npm audit fix` (security)
+2. ✅ Update `express` to 4.22.1+
+
+### RECOMMENDED
+1. Remove database packages (not used)
+2. Remove auth packages (not used)  
+3. Remove `input-otp` (not used)
+
+### OPTIONAL
+1. Remove unused UI packages for smaller bundle
+2. Remove Replit plugins if not on Replit
+
+### KEEP EVERYTHING ELSE
+All Radix UI, Tailwind, React ecosystem packages are essential or useful for future features.
